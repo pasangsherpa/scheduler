@@ -9,8 +9,9 @@
  *
  */
 
-
+//Main method.
 int main(void) {
+
 	return 0;
 }
 

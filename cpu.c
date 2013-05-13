@@ -1,5 +1,5 @@
 /*
- * cpu.h
+ * cpu.c
  *
  *  Created on: May 12, 2013
  *
@@ -8,14 +8,12 @@
  *  @author: Mars Goktruk
  *
  */
+#include "cpu.h"
 
-#ifndef CPU_H
-#define CPU_H
-
-typedef struct cpu {
+CPUPtr cpuConstruct() {
+	CPUPtr cpu = (CPUPtr) malloc(sizeof(CPUStr));
 
 	//Pointers to functions.
 
-} CPUStr, *CPUPtr;
-
-#endif /* CPU_H */
+	return cpu;
+}
