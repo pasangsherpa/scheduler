@@ -15,6 +15,7 @@
 typedef struct timer {
 
 	//Pointers to functions.
+	dhdgfhfhffgh
 
 } SysTimerStr, *SysTimerPtr;
 
