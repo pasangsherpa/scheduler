@@ -10,7 +10,15 @@
  */
 
  typedef struct {
- 	int mutex_id;
- 	Queue
-
+ 	int mutex_ownerID;
+ 	Queue mutex_queue;
  } Mutex, *MutexPtr;
+
+// Constructor
+MutexPtr MutexConstructor();
+
+// Destructor
+void MutexDestructor(MutexPtr);
+
+// Functions
+void MutexAdd(MutexPtr, int);			// Adds an id (pointer) to the mutex queue.
