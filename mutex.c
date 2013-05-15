@@ -11,7 +11,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "global.h"
 #include "queue.h"
+#include "mutex.h"
 
 /*
 * MutexPtr MutexConstructor()
@@ -31,6 +33,15 @@ void MutexDestructor(MutexPtr this) {
 	free(this);
 }
 
-void MutexAdd(MutexPtr m, *char id) {
+void MutexAdd(MutexPtr m, int *id) {
 	Enqueue(id, m -> mutex_queue);
 }
+
+int main() {
+		MutexPtr mutex = (MutexPtr) MutexConstructor();
+		int i = 5;
+
+		printf("\ni's address: %d\n", &i);
+		MutexAdd(mutex, &i);
+}
+

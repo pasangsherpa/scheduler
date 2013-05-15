@@ -21,4 +21,4 @@ MutexPtr MutexConstructor();
 void MutexDestructor(MutexPtr);
 
 // Functions
-void MutexAdd(MutexPtr, int);			// Adds an id (pointer) to the mutex queue.
+void MutexAdd(MutexPtr, int *);			// Adds an id (pointer) to the mutex queue.
