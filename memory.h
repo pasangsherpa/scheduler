@@ -12,5 +12,8 @@
 #ifndef MEMORY_H
 #define MEMORY_H
 
+typedef struct memory {
+
+} MemoryStr, *MemoryPtr;
 
 #endif /* MEMORY_H */

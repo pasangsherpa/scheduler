@@ -43,5 +43,6 @@ int main() {
 
 		printf("\ni's address: %d\n", &i);
 		MutexAdd(mutex, &i);
+		return 0;
 }
 
