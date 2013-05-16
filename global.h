@@ -12,10 +12,12 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
+
 /********* GENERAL **********/
 #define NO_ERROR			0
 #define QUEUE_SIZE 			50
 #define MAX_PROCESS			50
+typedef enum { false, true } bool;
 /******* END GENERAL ********/
 
 /********* PROCESS **********/

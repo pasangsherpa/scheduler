@@ -21,4 +21,5 @@ MutexPtr MutexConstructor();
 void MutexDestructor(MutexPtr);
 
 // Functions
+bool MutexIsLocked(MutexPtr)
 void MutexAdd(MutexPtr, int *);			// Adds an id (pointer) to the mutex queue.

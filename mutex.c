@@ -37,6 +37,15 @@ void MutexAdd(MutexPtr m, int *id) {
 	Enqueue(id, m -> mutex_queue);
 }
 
+bool MutexIsLocked(MutexPtr m) {
+	boolean result = false;
+
+	if (result != -1) {
+		result = true;
+	}
+	return result;
+}
+
 int main() {
 		MutexPtr mutex = (MutexPtr) MutexConstructor();
 		int i = 5;
