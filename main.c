@@ -11,9 +11,42 @@
 # include <stdio.h>
 # include <strings.h>
 # include <stdlib.h>
+#include <time.h>
 
-#define MINIMUM_NUM_PROCESS 1	//MIN NUM OF PROCESS TO RUN FOR EACH TYPE OF THE PROCESS
+#define MINIMUM_NUM_PROCESS 1	//MIN NUM OF PROCESS TO RUN FOR EACH TYPE OF THE PROCESS.
+#define MAX_NUM_STEPS_TO_RUN 1234567890	// MAX NUMBER OF TOTAL STEPS THIS PROGRAM WILL RUN.
+#define KEYBRD_PROCESS	1
 
+#define IO_SERVICE_CALL	7
+#define PC_READ_WRITE_CALL	5
+#define TIME_QUANTA	15	
+
+/*
+This function generates a 'somewhat' random number r, r >= min & r <= max
+*/
+int generateRandomNumber(int min, int max){
+	srand(time(NULL));
+	int r = (rand() % (max+1-min))+min;
+	printf("random= %d \n",r);
+	return r;
+}
+
+/*
+This method creates a processor thread with a random step number in a range(total step number of CPU),
+and generates random instruction number to make service calls.
+*/
+thread generateProcessThread(int totalStepNum, int type){
+	//generate random number of steps in range of totalStepNum
+	//set/generate number of service calls
+	//generate random instruction number to make the service call.
+	//create thread
+	//start thread.
+}
+
+/**
+This program expects arguments in this format:
+-p X -k X -io X -pc X X(number of total steps CPU will count), where X is an integer.
+**/
 int main(int argc, char * argv[]){
  
 	int processNumber = 0;
@@ -21,16 +54,18 @@ int main(int argc, char * argv[]){
 	int ioProcess = 0;
 	int pr_coProcess = 0;	
 	int computeBound = 0;
+	int stepCount = 0;
 	
-    if(argc != 9){
-		printf("Please run the program again in this format:\n ./scheduler -p X -k X -io X -pc X\nX implies an integer.");
+    if(argc != 10){
+		printf("Please run the program again in this format:\n ./scheduler -p X -k X -io X -pc X X\nX implies an integer.");
 		return 1;
 	}
 		
-	for(int i = 1 ; i < argc; i+=2){	
+	for(int i = 1 ; i < argc-1; i+=2){	
 			
 			if(strcasecmp("-p", argv[i]) == 0){			
-				processNumber = atoi(argv[i+1]);				
+				processNumber = atoi(argv[i+1]);
+				//create thread
 			}else if(strcasecmp("-k", argv[i]) == 0){
 				keyboardProcess = atoi(argv[i+1]);
 			}else if(strcasecmp("-io", argv[i]) == 0){
@@ -42,11 +77,12 @@ int main(int argc, char * argv[]){
 				return 1;
 			}
 	}
-			
+	
+	stepCount = atoi(argv[argc-1]) % MAX_NUM_STEPS_TO_RUN;	
 	computeBound = processNumber - (keyboardProcess+ioProcess+pr_coProcess);
 		
 	if(processNumber < MINIMUM_NUM_PROCESS * 4 || keyboardProcess < MINIMUM_NUM_PROCESS || ioProcess < MINIMUM_NUM_PROCESS || 	pr_coProcess < MINIMUM_NUM_PROCESS || computeBound < MINIMUM_NUM_PROCESS ){
-		printf("At least %d process needs to run for each TYPE.Try again.", MINIMUM_NUM_PROCESS);
+		printf("At least %d process needs to run for each TYPE. Try again.", MINIMUM_NUM_PROCESS);
 		return 1;
 	}
 		
@@ -58,10 +94,18 @@ int main(int argc, char * argv[]){
 	printf("I/O: %d\n",ioProcess);
 	printf("Producer-Consumer Pair: %d\n",pr_coProcess);
 	printf("Compute bound: %d\n",computeBound);	
+	printf("Step Count: %d\n",stepCount);
 	
-	//start
+	//start	
+		//main creates the CPU thread
+		//CPU cleans up/returns when done
+		//main returns when CPU returns.(thread join)
+	
+	
 		
 	return 0;
 	
 }
+
+
 

@@ -5,7 +5,7 @@
  *
  *  @author: Pasang Sherpa
  *  @author: Seth Kramer
- *  @author: Mars Goktruk
+ *  @author: Mars Gokturk
  *
  */
 
@@ -33,6 +33,17 @@ typedef enum { false, true } bool;
 #define INTERRUPED			2
 #define BLOCKED				3
 /******* END PROCESS ********/
+
+/******TRAP VECTOR TABLE*****/
+#define TIMER_INT		7
+#define IO_INT			6
+#define KEYBRD_INT		8
+#define	IO_REQ			5
+#define MUTEX_LOCK		4
+#define MUTEX_UNLOCK	3	
+#define COND_WAIT		2
+#define COND_SIGNAL		1
+/*******END TRAP************/
 
 #endif /* GLOBAL_H */
 
