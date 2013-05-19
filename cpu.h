@@ -42,9 +42,9 @@ void CPUDestructor(CPUPtr this);
 int checkINT(CPUPtr this);
 int saveState(CPUPtr this, ProcessPtr currentProcess);
 int enableINT(CPUPtr this);
-int disableINT(CPUPtr this)	
+int disableINT(CPUPtr this);
 int timer_int_handler(CPUPtr this,SchedulerPtr scheduler);
-int io-_int_handler(CPUPtr this); //task: IO device queue
+int io_int_handler(CPUPtr this); //task: IO device queue
 int io_req_trap_handler(CPUPtr this, SchedulerPtr scheduler);//task:I/O device queue
 int mutex_lock_trap_handler(CPUPtr this,MutexPtr mutex); 
 int mutex_unlock_trap_handler(CPUPtr this, ProcessPtr process); //assumption: we know which process
