@@ -5,7 +5,7 @@
  *
  *  @author: Pasang Sherpa
  *  @author: Seth Kramer
- *  @author: Mars Goktruk
+ *  @author: Mars Gokturk
  *
  */
 
@@ -21,5 +21,5 @@ MutexPtr MutexConstructor();
 void MutexDestructor(MutexPtr);
 
 // Functions
-bool MutexIsLocked(MutexPtr)
+bool MutexIsLocked(MutexPtr);
 void MutexAdd(MutexPtr, int *);			// Adds an id (pointer) to the mutex queue.

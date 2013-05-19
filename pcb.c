@@ -5,7 +5,7 @@
  *
  *  @author: Pasang Sherpa
  *  @author: Seth Kramer
- *  @author: Mars Goktruk
+ *  @author: Mars Gokturk
  *
  */
 #include "pcb.h"
@@ -35,3 +35,4 @@ int PCBDestructor(PCBPtr this) {
 	free(this);
 	return NO_ERROR;
 }
+

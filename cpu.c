@@ -5,7 +5,7 @@
  *
  *  @author: Pasang Sherpa
  *  @author: Seth Kramer
- *  @author: Mars Goktruk
+ *  @author: Mars Gokturk
  *
  */
 #include "cpu.h"

@@ -33,7 +33,7 @@ typedef struct cpu {
 } CPUStr, *CPUPtr;
 
 // Constructor
-CPUPtr CPUConstructor();
+CPUPtr CPUConstructor(int no_processes, int prod_cons_pair, int cycle);
 
 // Destructor
 void CPUDestructor(CPUPtr this);

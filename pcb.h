@@ -5,7 +5,7 @@
  *
  *  @author: Pasang Sherpa
  *  @author: Seth Kramer
- *  @author: Mars Goktruk
+ *  @author: Mars Gokturk
  *
  */
 #ifndef PCB_H
@@ -28,5 +28,5 @@ typedef struct pcb {
 
 PCBPtr PCBConstructor(int process_id, ProcessPtr process);
 int PCBDestructor(PCBPtr this);
-
+int saveContext(PCBPtr this);
 #endif /* PCB_H */

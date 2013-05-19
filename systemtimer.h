@@ -5,7 +5,7 @@
  *
  *  @author: Pasang Sherpa
  *  @author: Seth Kramer
- *  @author: Mars Goktruk
+ *  @author: Mars Gokturk
  *
  */
 
@@ -15,7 +15,6 @@
 typedef struct timer {
 
 	//Pointers to functions.
-	dhdgfhfhffgh
 
 } SysTimerStr, *SysTimerPtr;
 
