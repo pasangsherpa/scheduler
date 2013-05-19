@@ -8,6 +8,7 @@
  *  @author: Mars Gokturk
  *
  */
+#include <stdlib.h>
 #include "pcb.h"
 
 #ifndef GLOBAL_H
@@ -15,10 +16,9 @@
 #endif
 
 //Constructor
-PCBPtr PCBConstructor(int pid, ProcessPtr process){
+PCBPtr PCBConstructor(int pid){
 	PCBPtr pcb = (PCBPtr)malloc(sizeof(PCBStr));
 	pcb->pid = pid;
-	pcb->process = process;
 	pcb->state = READY;
 	pcb->next_step = 0;
 	pcb->waiting_on = 0;

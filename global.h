@@ -50,10 +50,10 @@ typedef enum { false, true } bool;
 /*******END KERNEL SERVICE***************************/
 
 /*******IRQ LINES***********/
-#define KEYBOARD	1		
-#define	AUDIO		2
-#define	VIDEO		3
-#define TIMER		4
+#define IRQ_KEYBOARD	1
+#define	AUDIO			2
+#define	VIDEO			3
+#define TIMER			4
 /*******IRQ LINES**********/
 
 /*******INT PRIORITY LEVELS***/

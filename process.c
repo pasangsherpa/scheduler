@@ -8,7 +8,7 @@
  *  @author: Mars Gokturk
  *
  */
-
+#include <stdlib.h>
 #include "process.h"
 
 #ifndef GLOBAL_H
@@ -21,7 +21,7 @@ ProcessPtr ProcessConstructor(int pid, int proc_type, int no_steps, int no_reque
 	process->proc_type = proc_type;
 	process->no_steps = no_steps;
 	process->no_requests = no_steps;
-	process->pcb = PCBConstructor(pid, process);
+	process->pcb = PCBConstructor(pid);
 	return process;
 }
 

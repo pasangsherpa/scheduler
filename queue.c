@@ -27,6 +27,10 @@ int IsFull(Queue Q) {
   return Q->Size == Q->Capacity;
 }
 
+int Size(Queue Q) {
+  return Q->Size;
+}
+
 Queue CreateQueue(int MaxElements) {
   Queue Q;
 

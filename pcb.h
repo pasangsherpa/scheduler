@@ -16,7 +16,7 @@ typedef struct pcb {
 	int next_step;		// step count that the CPU had gotten to when this process was
 						// prempted (like a PC register value)
 	int state;			// e.g. 0=running, 1=ready, 2=interrupted, 3=blocked
-	ProcessPtr process; // pointer to the actual process
+//	ProcessPtr process; // pointer to the actual process
 	int waiting_on;		// which queue is it in if it is waiting on something (blocked)
 	int owns;			// which mutex lock does it own
 
@@ -26,7 +26,7 @@ typedef struct pcb {
 
 } PCBStr, *PCBPtr;
 
-PCBPtr PCBConstructor(int process_id, ProcessPtr process);
+PCBPtr PCBConstructor(int process_id);
 int PCBDestructor(PCBPtr this);
 int saveContext(PCBPtr this);
 #endif /* PCB_H */

@@ -12,6 +12,10 @@
 #ifndef PROCESS_H
 #define PROCESS_H
 
+#ifndef PCB_H
+#include "pcb.h"
+#endif
+
 typedef struct process {
 	PCBPtr pcb;
 	int proc_type;       // code for process type, e.g. 0=compute, 1=i0, 2=keyboard, etc.

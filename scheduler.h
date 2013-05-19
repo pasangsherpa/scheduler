@@ -12,6 +12,14 @@
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
+#ifndef QUEUE_H
+#include "queue.h"
+#endif
+
+#ifndef PROCESS_H
+#include "process.h"
+#endif
+
 typedef struct scheduler {
 	Queue ready_queue;
 	ProcessPtr current_process;

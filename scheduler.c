@@ -8,12 +8,8 @@
  *  @author: Mars Gokturk
  *
  */
-
+#include <stdio.h>
 #include "scheduler.h"
-
-#ifndef QUEUE_H
-#include "queue.h"
-#endif
 
 #ifndef  GLOBAL_H
 #include "global.h"
@@ -97,7 +93,8 @@ ProcessPtr getCurrentProcess(SchedulerPtr this) {
  * Test Scheduler
  */
 void testScheduler(SchedulerPtr this) {
-	int i;
+
+	printf("Testing\n");
 	ProcessPtr p1 = ProcessConstructor(001, COMPUTE, 50, 10);
 	p1->pcb->state = RUNNING;
 	ProcessPtr p2 = ProcessConstructor(002, IO, 50, 10);
@@ -111,13 +108,26 @@ void testScheduler(SchedulerPtr this) {
 
 	this->addToReadyQueue(this, p4);
 	this->addToReadyQueue(this, p5);
+	printf("Ready Queue size before setting current process: %d\n", Size(this->ready_queue));
 
+	this->setCurrentProcess(this); //Initialization.
+	printf("Ready Queue size after setting current process: %d\n", Size(this->ready_queue));
+	printf("Current Process: %d\n", this->current_process->pcb->pid);
+	ProcessPtr p = this->current_process;
+	printf("Process %d's status before interrupt is %d \n", p->pcb->pid, p->pcb->state);
+	int PC = 999;
+	printf("Timer Interrupt......\n");
+	this->current_process->pcb->state = INTERRUPTED;
+	this->switchProcess(this, PC);
+	printf("Ready Queue size after switching process: %d\n", Size(this->ready_queue));
+	printf("Current Process: %d\n", this->current_process->pcb->pid);
+	printf("Process %d's status before interrupt is %d \n", p->pcb->pid, p->pcb->state);
 
 }
 
-int main(void) {
-	SchedulerPtr slr = SchedulerConstructor(10);
-	testScheduler(slr);
-
-	return 0;
-}
+//int main(void) {
+//	SchedulerPtr slr = SchedulerConstructor(10);
+//	testScheduler(slr);
+//
+//	return 0;
+//}
