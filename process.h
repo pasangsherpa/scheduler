@@ -25,5 +25,5 @@ typedef struct process {
 
 ProcessPtr ProcessConstructor(int pid, int proc_type, int no_steps, int no_requests);
 int ProcessDestructor(ProcessPtr this);
-
+int run(ProcessPtr this);
 #endif /* PROCESS_H */

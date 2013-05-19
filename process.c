@@ -31,3 +31,30 @@ int ProcessDestructor(ProcessPtr this) {
 	free(this);
 	return NO_ERROR;
 }
+
+//Run the process depending on its type.
+int run(ProcessPtr this) {
+	int type = this->proc_type;
+	switch (type) {
+		case COMPUTE:
+			//Create a compute process.
+			break;
+		case IO:
+			//Create a IO process.
+			break;
+		case KEYBOARD:
+			//Create a Keyboard process.
+			break;
+		case PRODUCER:
+			//Create a Producer process.
+			break;
+		case CONSUMER:
+			//Create a Consumer process.
+			break;
+		default:
+			break;
+	}
+	return NO_ERROR;
+}
+
+
