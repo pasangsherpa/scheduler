@@ -34,16 +34,34 @@ typedef enum { false, true } bool;
 #define BLOCKED				3
 /******* END PROCESS ********/
 
-/******TRAP VECTOR TABLE*****/
-#define TIMER_INT		7
-#define IO_INT			6
-#define KEYBRD_INT		8
-#define	IO_REQ			5
-#define MUTEX_LOCK		4
-#define MUTEX_UNLOCK	3	
-#define COND_WAIT		2
-#define COND_SIGNAL		1
-/*******END TRAP************/
+/******TRAP AND INT(KERNEL SERVICE)VECTOR TABLE*****/
+#define TIMER_INT				1 //represents a memory address
+#define VIDEO_SERVICE_REQ		2
+#define VIDEO_SERVICE_COMPLETED	3
+#define KEYBOARD_SERVICE_REQ	4
+#define KEYBOARD_COMPLETED		5
+#define	AUDIO_SERVICE_REQ		6
+#define AUDIO_SERVICE_COMPLETED	7
+#define MUTEX_LOCK				8
+#define MUTEX_UNLOCK			9	
+#define COND_WAIT				10		
+#define COND_SIGNAL				11		
+/*******END KERNEL SERVICE***************************/
+
+/*******IRQ LINES***********/
+#define KEYBOARD	1		
+#define	AUDIO		2
+#define	VIDEO		3
+#define TIMER		4
+/*******IRQ LINES**********/
+
+/*******INT PRIORITY LEVELS***/
+#define TIMER_P		2
+#define	KEYBRD_P	0
+#define AUDIO_P		1
+#define VIDEO_P		1
+/*******INT PRIORITY LEVELS***/
+
 
 #endif /* GLOBAL_H */
 
