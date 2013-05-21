@@ -24,6 +24,11 @@
 #include "process.h"
 #endif
 
+#ifndef PCB_H
+#include "pcb.h"
+#endif
+
+
 typedef struct cpu {
         int PC; //Program counter
         MemoryPtr memory;
@@ -45,8 +50,10 @@ int CPUDestructor(CPUPtr this);
 
 int keyboardServiceRequest(CPUPtr this, SchedulerPtr the_pcb);
 int keyboardServiceCompleted(CPUPtr this, char the_keyboard_data);
-int poll(CPUPtr this); //thread	
+void poll(CPUPtr this); //thread	
 int timer_int_handler(CPUPtr this,SchedulerPtr scheduler);
+void printState(CPUPtr this);
+void printQueue(Queue the_queue);
 
 
 //int mutex_lock_trap_handler(CPUPtr this,MutexPtr mutex); 

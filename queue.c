@@ -126,3 +126,20 @@ ElementType FrontAndDequeue(Queue Q) {
 
 }
 
+ElementType * getQueue(Queue Q){
+
+	ElementType * result = malloc( sizeof(ElementType) * Q->Size); //returns a mutable copy of the elements array	
+	if(IsEmpty(Q)){
+		Error("getQueue Error: The queue is empty.");
+		return Q->Array;
+	} else {	
+		int index = 0;	
+		int i;
+		for(i = Q->Front; i <= Q->Rear;i++){
+			result[index] = Q->Array[i];				
+			index++;
+		}
+	}
+	return result;
+}
+
