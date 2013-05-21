@@ -21,6 +21,7 @@ typedef void *ElementType;
 
   int         IsEmpty(Queue Q);
   int         IsFull(Queue Q);
+  int		  Size(Queue Q);
   Queue       CreateQueue(int MaxElements);
   void        DisposeQueue(Queue Q);
   void        MakeEmpty(Queue Q);

@@ -19,12 +19,15 @@
 SchedulerPtr SchedulerConstructor(int max_processes) {
 	SchedulerPtr scheduler = (SchedulerPtr) malloc(sizeof(SchedulerStr));
 	scheduler->ready_queue = CreateQueue(max_processes);
+	scheduler->io_queue = CreateQueue(max_processes);
+	scheduler->mutex_queue = CreateQueue(max_processes);
+
 
 	//Pointers to functions.
 	scheduler->destroy = SchedulerDestructor;
 	scheduler->setCurrentProcess = setCurrentProcess;
 	scheduler->getCurrrentProcess = getCurrentProcess;
-	scheduler->addToReadyQueue = addToReadyQueue;
+	scheduler->addToQueue = addToQueue;
 	scheduler->switchProcess = switchProcess;
 
 	return scheduler;
@@ -33,6 +36,8 @@ SchedulerPtr SchedulerConstructor(int max_processes) {
 //Destructor
 int SchedulerDestructor(SchedulerPtr this) {
 	DisposeQueue(this->ready_queue);
+	DisposeQueue(this->io_queue);
+	DisposeQueue(this->mutex_queue);
 	free(this);
 	return NO_ERROR;
 }
@@ -45,40 +50,62 @@ int setCurrentProcess(SchedulerPtr this) {
 		return ERROR;
 	}
 	this->current_process = FrontAndDequeue(this->ready_queue);
+	this->current_process->pcb->state = RUNNING;
 	return NO_ERROR;
 }
 
 /**
  * Switch the current running process with the next process in readyqueue and
  * return the new current running process.
+ * Assumes all saving context is taken care of before making call to this function.
  */
-ProcessPtr switchProcess(SchedulerPtr this, int PC) {
-	ProcessPtr process = this->current_process;
-	switch (process->pcb->state) {
-		case RUNNING:
-			process->pcb->state = READY;
+ProcessPtr switchProcess(SchedulerPtr this, int PC, int interrupt) {
+	ProcessPtr process = NULL;
+
+	switch (interrupt) {
+		case TIMER_INT:
+			this->addToQueue(this, this->current_process, this->ready_queue);
+			this->current_process->pcb->state = READY;
+			this->setCurrentProcess(this);
+			this->current_process->no_steps = PC;
+			break;
+		case VIDEO_SERVICE_REQ:
+		case AUDIO_SERVICE_REQ:
+		case KEYBOARD_SERVICE_REQ:
+			this->addToQueue(this, this->current_process, this->io_queue);
+			this->current_process->pcb->state = RUNNING;
+			this->setCurrentProcess(this);
+			this->current_process->no_steps = PC;
+			break;
+		case VIDEO_SERVICE_COMPLETED:
+		case AUDIO_SERVICE_COMPLETED:
+		case KEYBOARD_COMPLETED:
+			if (!IsEmpty(this->io_queue)) {
+				process = FrontAndDequeue(this->io_queue);
+				process->pcb->state = READY;
+				this->addToQueue(this, process, this->ready_queue);
+			}
+			break;
+		case MUTEX_LOCK:
+			//Check if mutex is available
+			//If not add the process to mutex queue
+			//Get the process from the readyqueue.
 			break;
 		default:
 			break;
 	}
-	addToReadyQueue(this, process);
-	this->setCurrentProcess(this);
-	if (this->setCurrentProcess != NULL) {
-		this->current_process->pcb->next_step = PC;
-		this->current_process->pcb->state = RUNNING;
-		return this->current_process;
-	}
-	return NULL;
+
+	return this->current_process;
 }
 
 /**
- * Add a process to the Ready Queue.
+ * Add a process to the Queue.
  */
-int addToReadyQueue(SchedulerPtr this, ProcessPtr process) {
-	if (IsFull(this->ready_queue)) {
+int addToQueue(SchedulerPtr this, ProcessPtr process, Queue Q) {
+	if (IsFull(Q)) {
 		return ERROR;
 	}
-	Enqueue(process, this->ready_queue);
+	Enqueue(process, Q);
 	return NO_ERROR;
 }
 
@@ -106,23 +133,34 @@ void testScheduler(SchedulerPtr this) {
 	p4->pcb->owns = 1; // P4 owns mutex 1;
 	ProcessPtr p5 = ProcessConstructor(005, CONSUMER, 50, 10); //Default state is READY
 
-	this->addToReadyQueue(this, p4);
-	this->addToReadyQueue(this, p5);
+	this->addToQueue(this, p4, this->ready_queue);
+	this->addToQueue(this, p5, this->ready_queue);
 	printf("Ready Queue size before setting current process: %d\n", Size(this->ready_queue));
 
 	this->setCurrentProcess(this); //Initialization.
 	printf("Ready Queue size after setting current process: %d\n", Size(this->ready_queue));
 	printf("Current Process: %d\n", this->current_process->pcb->pid);
 	ProcessPtr p = this->current_process;
-	printf("Process %d's status before interrupt is %d \n", p->pcb->pid, p->pcb->state);
 	int PC = 999;
-	printf("Timer Interrupt......\n");
+	printf("\nTimer Interrupt......\n");
+	printf("Ready Queue size before switching process: %d\n", Size(this->ready_queue));
 	this->current_process->pcb->state = INTERRUPTED;
-	this->switchProcess(this, PC);
+	this->switchProcess(this, PC, TIMER_INT);
 	printf("Ready Queue size after switching process: %d\n", Size(this->ready_queue));
 	printf("Current Process: %d\n", this->current_process->pcb->pid);
-	printf("Process %d's status before interrupt is %d \n", p->pcb->pid, p->pcb->state);
 
+	printf("\nIO Interrupt......\n");
+	p = this->current_process;
+	this->current_process->pcb->state = INTERRUPTED;
+	printf("Ready Queue size before switching process: %d\n", Size(this->ready_queue));
+	printf("IO Queue size before switching process: %d\n", Size(this->io_queue));
+	this->switchProcess(this, PC, KEYBOARD_SERVICE_REQ);
+	printf("Current Process: %d\n", this->current_process->pcb->pid);
+	printf("IO Queue size after switching process: %d\n", Size(this->io_queue));
+	printf("Ready Queue size after switching process: %d\n", Size(this->ready_queue));
+
+	p = Front(this->io_queue);
+	printf("Process %d's status after interrupt is %d \n", p->pcb->pid, p->pcb->state);
 }
 
 //int main(void) {

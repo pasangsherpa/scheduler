@@ -22,13 +22,16 @@
 
 typedef struct scheduler {
 	Queue ready_queue;
+	Queue io_queue;
+	Queue mutex_queue;
+
 	ProcessPtr current_process;
 
 	//pointers to functions
 	int (*destroy)(struct scheduler*);
 	int(*setCurrentProcess)(struct scheduler*);
-	ProcessPtr(*switchProcess)(struct scheduler*, int);
-	int(*addToReadyQueue)(struct scheduler*, ProcessPtr);
+	ProcessPtr(*switchProcess)(struct scheduler*, int, int);
+	int(*addToQueue)(struct scheduler*, ProcessPtr, Queue);
 	ProcessPtr(*getCurrrentProcess)(struct scheduler*);
 
 } SchedulerStr, *SchedulerPtr;
@@ -36,8 +39,8 @@ typedef struct scheduler {
 SchedulerPtr SchedulerConstructor(int max_processes);
 int SchedulerDestructor(SchedulerPtr this);
 int setCurrentProcess(SchedulerPtr this);
-ProcessPtr switchProcess(SchedulerPtr this, int pc);
-int addToReadyQueue(SchedulerPtr this, ProcessPtr process);
+ProcessPtr switchProcess(SchedulerPtr this, int pc, int interrupt);
+int addToQueue(SchedulerPtr this, ProcessPtr process, Queue Q);
 ProcessPtr getCurrentProcess(SchedulerPtr this);
 
 
