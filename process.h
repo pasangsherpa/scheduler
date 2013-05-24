@@ -16,18 +16,26 @@
 #include "pcb.h"
 #endif
 
+#ifndef REQUEST_H
+#include "request.h"
+#endif
+
 typedef struct process {
 	PCBPtr pcb;
 	int proc_type;       // code for process type, e.g. 0=compute, 1=i0, 2=keyboard, etc.
 	int	no_steps;		// number of time steps before resetting to 0 - number of instructions
 	int no_requests;	// number of requests that will be generated during the process run
-	int *requests;		// an array of requests, each request (e.g. io service) is issued at a specific
+	RequestPtr * requests;		// an array of requests, each request (e.g. io service) is issued at a specific
 						// time step. These are the synchronous events that result in traps being issued.
 						// You can get fancy and make this an array of RequestTypeStr which contains the
 						// step number when issued, and a request type (e.g. 0=io, 1=sync, etc.)
+	int req_index;		//keeps track of the next call and step num.
 } ProcessStr, *ProcessPtr;
 
 ProcessPtr ProcessConstructor(int pid, int proc_type, int no_steps, int no_requests);
 int ProcessDestructor(ProcessPtr this);
 int run(ProcessPtr this);
+int addToRequestArray(RequestPtr * req_array, int * num_array, int * proc_type, int the_length);
+int getNextTrapStep(ProcessPtr this);
+int getNextTrapCode(ProcessPtr this);
 #endif /* PROCESS_H */
