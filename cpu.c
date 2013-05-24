@@ -14,7 +14,7 @@
 #include "global.h"
 #endif
 
-CPUPtr CPUConstructor(the_max_step_count) {
+CPUPtr CPUConstructor(int the_max_step_count) {
 		CPUPtr result = (CPUPtr) malloc(sizeof(CPUStr));
 		result->PC = 0;										//current process' PC										
 		result->max_step_count = the_max_step_count;		//max steps this CPU will run
@@ -26,7 +26,7 @@ CPUPtr CPUConstructor(the_max_step_count) {
 		result->IRQ = 0;									//IRQ code of the interrupting device	
 		result->resume = 0;									//may not be necessary
 		result->buffer_data = '0';							//buffer	
-		result->process_pid = 0;										//current process pid
+		result->process_pid = 0;							//current process pid
 
 		return result;
 }
@@ -37,9 +37,9 @@ Context switch: CPU's context is switched to the next process selected by the pr
 void setNextProcess(CPUPtr this){ 
 	this->current_process = getCurrentProcess(this->scheduler); 
 	this->PC = this->current_process->no_steps;
-	this->next_step = this->current_process->pcb->next_step;	
-	//this->next_process = this->current_process->pcb->trap vector code to run
-	this->process_pid = this->current_process->pcb->pid;
+	this->next_step = getNextTrapStep(this->current_process);	
+	this->next_process = getNextTrapCode(this->current_process);
+	this->process_pid = this->current_process->pcb->pid;	
 	this->resume = 1;
 }
 
@@ -59,7 +59,7 @@ void runCPU(CPUPtr this){ 					//main thread.//assumes that the fields are set
 	while(this->max_step_count > 0 && this->resume ==1){	
 		this->max_step_count--;//decrement the max step
 		this->PC--;
-		
+		printf("Current count = %d\n",this->max_step_count);
 		if(this->INT ==1){	
 			
 			switch(this->IRQ){
@@ -97,6 +97,7 @@ void runCPU(CPUPtr this){ 					//main thread.//assumes that the fields are set
 				break;
 				case KEYBOARD_SERVICE_REQ://special case //context switch
 				saveState(this);
+				printf("Saved state \n");
 				keyboardServiceRequest(this);						
 				break;
 				case AUDIO_SERVICE_REQ: //context switch //create audio service thread
@@ -227,27 +228,68 @@ int main (void){
 	//Context switch
 	
 	//Initial prep
-	CPUPtr cpu = CPUConstructor(6);		
-	ProcessPtr process1 = ProcessConstructor(111,IO,1,3);
-	ProcessPtr process2 = ProcessConstructor(222,IO,1,3);	
-	 
-	addToQueue(cpu->scheduler, process1, cpu->scheduler->ready_queue);
-	addToQueue(cpu->scheduler, process2, cpu->scheduler->ready_queue);
-	setCurrentProcess(cpu->scheduler);
+	//CPU
+	CPUPtr cpu = CPUConstructor(30);	
+
+	//Construct 2 Processes
+		
+		//main creates an array of request step no's and an array of trap codes
+		
+		int  * step_array = malloc(4 * sizeof(int));  //main generates the random nums.
+		int  * code_array = malloc(4 * sizeof(int));
 	
+			step_array[0] = 1;
+			step_array[1] = 8;
+			step_array[2] = 3;
+			step_array[3] = 9;
+			code_array[0] = 4;
+			code_array[1] = 6;
+			code_array[2] = 8;
+			code_array[3] = 4;
+	
+	
+		//main calls the process constructor
+			//Process type:I/0
+			//Num of calls = 4
+			//Step nums: 1,8,3,9
+			//Trap codes: 2,4,6,8
+			//number of total steps:10
+		ProcessPtr process1 =  ProcessConstructor(111, IO, 10, 4) ;
+	
+		//set requests array
+		addToRequestArray(process1->requests, step_array, code_array, process1->no_requests);
+	
+	
+			//Process type:I/0
+			//Num of calls = 4
+			//Step nums: 3,5,1,9
+			//Trap codes: 8,9,10,11
+			//number of total steps:10
+			step_array[0] = 3;
+			step_array[1] = 5;
+			step_array[2] = 1;
+			step_array[3] = 9;
+			code_array[0] = 8;
+			code_array[1] = 9;
+			code_array[2] = 10;
+			code_array[3] = 11;
+	
+			ProcessPtr process2 = ProcessConstructor(222,IO,10,4);			
+			addToRequestArray(process2->requests, step_array, code_array, process2->no_requests);			
+			
+			
+				 
+	 //main adds the processes to the scheduler's queue.
+		addToQueue(cpu->scheduler, process1, cpu->scheduler->ready_queue);
+		addToQueue(cpu->scheduler, process2, cpu->scheduler->ready_queue);
+		
+	//get CPU's initial process to run.
+		setCurrentProcess(cpu->scheduler);
+		setNextProcess(cpu); //load selected process state to the cpu.
 	
 	//CPU RUN
-	setNextProcess(cpu);
-	printf("Process is set %d\n",cpu->process_pid);
+	runCPU(cpu);
 	
-	//state
-	printState(cpu);
-	
-	//calls the service
-	keyboardServiceRequest(cpu);
-	
-	//state
-	printState(cpu);	
 	
 	return 0;
 }
