@@ -14,54 +14,157 @@
 #include "global.h"
 #endif
 
-CPUPtr CPUConstructor(int no_processes, int prod_cons_pair, int cycle) {
-        CPUPtr cpu = (CPUPtr) malloc(sizeof(CPUStr));
-        cpu->PC = 0;
-        cpu->memory = MemoryConstructor();
-        cpu->scheduler = SchedulerConstructor(MAX_PROCESS);
-        cpu->no_processes = no_processes;
-        cpu->process_list = (ProcessPtr*)(malloc(MAX_PROCESS *(sizeof(ProcessStr))));
-		cpu->keyboard_queue = (Queue) CreateQueue(QUEUE_SIZE);
-        //Pointers to functions.
+CPUPtr CPUConstructor(the_max_step_count) {
+		CPUPtr result = (CPUPtr) malloc(sizeof(CPUStr));
+		result->PC = 0;										//current process' PC										
+		result->max_step_count = the_max_step_count;		//max steps this CPU will run
+		result->scheduler = SchedulerConstructor(MAX_PROCESS);//process scheduler				
+		result->next_process = 0;							//next service call address in the trap vector
+		result->next_step=0;								//next PC when currently running process will be preemted.		
+		result->current_process = NULL;						//currently running process
+		result->INT =0;										//whether this cpu is interrupted.
+		result->IRQ = 0;									//IRQ code of the interrupting device	
+		result->resume = 0;									//may not be necessary
+		result->buffer_data = '0';							//buffer	
+		result->process_pid = 0;										//current process pid
 
-        return cpu;
+		return result;
 }
 
-int keyboardServiceRequest(CPUPtr this, SchedulerPtr the_scheduler){ //a key press should trigger this method.
+/*
+Context switch: CPU's context is switched to the next process selected by the process scheduler.
+*/
+void setNextProcess(CPUPtr this){ 
+	this->current_process = getCurrentProcess(this->scheduler); 
+	this->PC = this->current_process->no_steps;
+	this->next_step = this->current_process->pcb->next_step;	
+	//this->next_process = this->current_process->pcb->trap vector code to run
+	this->process_pid = this->current_process->pcb->pid;
+	this->resume = 1;
+}
+
+/*
+Devices call this method when they send INT signal to the CPU.
+*/
+void interruptCPU(CPUPtr this, int the_IRQ, char the_data){
+	this->INT = 1;
+	this->IRQ = the_IRQ;
+	this->buffer_data = the_data;
+}
+
+/*
+CPU thread runs as long as there are more steps to run.
+*/
+void runCPU(CPUPtr this){ 					//main thread.//assumes that the fields are set
+	while(this->max_step_count > 0 && this->resume ==1){	
+		this->max_step_count--;//decrement the max step
+		this->PC--;
 		
-		ProcessPtr curr_process = getCurrentProcess(the_scheduler); 		
-		curr_process->pcb->state = BLOCKED;		//process is blocked
-		curr_process->no_steps = this->PC;		//context saved			
-		Enqueue(curr_process, this-> keyboard_queue); //Enqueue the PCB to the I/O queue.
+		if(this->INT ==1){	
+			
+			switch(this->IRQ){
+				case TIMER_INT:						 			
+					//saveState(this);					
+					//switchProcess(this->scheduler, this->PC, 1); 			
+				
+				break;
+				case AUDIO_SERVICE_COMPLETED: //no context switch					
+					//saveState(this);					
+					//switchProcess(this->scheduler, this->PC, 7);//QUEUE IS OK
+					
+				break;
+				case VIDEO_SERVICE_COMPLETED://no context switch	
+					//saveState(this);					
+					//switchProcess(this->scheduler, this->PC, 3);					
+					
+				break;
+				case KEYBOARD_COMPLETED://no context switch	
+					saveState(this);
+					keyboardServiceCompleted(this);					
+				break;
+				default:
+					printf("INT not recognized");
+			}
+				
+		}
+		
+		if(this->PC == this->next_step) {//time to make a service call
+			this->resume = 0;
+			switch(this->next_process){			
+				case VIDEO_SERVICE_REQ: //context switch	
+				//saveState(this); //create video service thread
+				//switchProcess(this->scheduler, this->PC, 2);					
+				break;
+				case KEYBOARD_SERVICE_REQ://special case //context switch
+				saveState(this);
+				keyboardServiceRequest(this);						
+				break;
+				case AUDIO_SERVICE_REQ: //context switch //create audio service thread
+				//saveState(this);
+				//switchProcess(this->scheduler, this->PC, 6);
+				break;
+				case MUTEX_LOCK:
+				//saveState(this);
+				//switchProcess(this->scheduler, this->PC, 8);
+				break;
+				case MUTEX_UNLOCK:
+				//saveState(this);
+				//switchProcess(this->scheduler, this->PC, 9);
+				break;
+				case COND_WAIT: //context switch
+				//saveState(this);
+				//switchProcess(this->scheduler, this->PC, 10);
+				break;
+				case COND_SIGNAL:
+				//saveState(this);
+				//switchProcess(this->scheduler, this->PC, 11);
+				break;
+				default:
+					printf("TRAP not recognized");
+			}
+		}
+	}
+	//kill cpu
+}
+
+	
+void saveState(CPUPtr this){
+	  this->current_process->no_steps = this->PC;
+}
+
+void keyboardServiceRequest(CPUPtr this){ //a key press should trigger this method.		
 		printf("------------------I/O REQUEST---------------------\n");
-		printf("Process PID = %d requested a keyboard service.\n",curr_process->pcb->pid);
-		printf("Process PID = %d's PC = %d has been saved to its PCB\n",curr_process->pcb->pid,curr_process->no_steps);		
-		setCurrentProcess(the_scheduler);
-		printf("Process PID = %d - running\n", getCurrentProcess(the_scheduler)->pcb->pid);	
+		printf("Process PID = %d requested a keyboard service.\n",this->process_pid);
+		printf("Process PID = %d's PC = %d has been saved to its PCB\n",this->process_pid,this->PC);		
+		switchProcess(this->scheduler, this->PC, 4);
+		setNextProcess(this);
+		printf("Process PID = %d - running\n", this->process_pid);	
 		printf("------------------I/O REQUEST---------------------\n");
 		printf("Enter char: \n");
-		poll(this);			
-		return 0;
+		getKey(this);			
+		
 }
 
-void poll(CPUPtr this){ 
-		char stdin_char = getchar();
-		getchar();
-		keyboardServiceCompleted(this, stdin_char);		
-}
-																
-int keyboardServiceCompleted(CPUPtr this, char c){
+void keyboardServiceCompleted(CPUPtr this){
 	printf("------------------I/O INT---------------------\n");
 	printf("I/O Completion Interrupt[Keyboard Device with IRQ = %d]\n", IRQ_KEYBOARD);
-	ProcessPtr completed_process = FrontAndDequeue(this->keyboard_queue); //process removed from keyboard queue
-	printf("P%d selected from Keyboard I/O Queue\n",completed_process->pcb->pid);
-	printf("P%d returned to Ready Queue\n",completed_process->pcb->pid);
-	printf("Key pressed =  %c\n",c);
-	printf("P%d- running\n",getCurrentProcess(this->scheduler)->pcb->pid);
-	printf("------------------I/O INT---------------------\n");
-	int result = addToReadyQueue(this->scheduler, completed_process);
-	return result;	
+	//get the pid of the process(I/O queue) from the scheduler.
+	switchProcess(this->scheduler, this->PC, 5);
+	printf("Key pressed =  %c\n",this->buffer_data);
+	printf("P%d- running\n",this->process_pid);
+	printf("------------------I/O INT---------------------\n");	
 }
+
+/*
+The Keyboard Device.
+*/
+void getKey(CPUPtr this){ 
+		char stdin_char = getchar();
+		getchar();
+		interruptCPU(this, 1, stdin_char);
+}
+																
+
 
 /*
 Prints out the state of the simulation: Running process, queues etc.
@@ -71,7 +174,7 @@ void printState(CPUPtr this){
 	printf("------------------State---------------------\n");
 	printf("P%d - running\n", curr_process->pcb->pid);
 	printf("Keyboard Device I/O Queue -");
-	printQueue(this->keyboard_queue);
+	//printQueue(this->keyboard_queue);    //Get queue from the scheduler
 	printf("\n");
 	printf("Scheduler Ready Queue -");
 	printQueue(this->scheduler->ready_queue);
@@ -124,19 +227,24 @@ int main (void){
 	//Context switch
 	
 	//Initial prep
-	CPUPtr cpu = CPUConstructor(6,6,6);		
+	CPUPtr cpu = CPUConstructor(6);		
 	ProcessPtr process1 = ProcessConstructor(111,IO,1,3);
 	ProcessPtr process2 = ProcessConstructor(222,IO,1,3);	
-	addToReadyQueue(cpu->scheduler, process1); 
-	addToReadyQueue(cpu->scheduler, process2);
+	 
+	addToQueue(cpu->scheduler, process1, cpu->scheduler->ready_queue);
+	addToQueue(cpu->scheduler, process2, cpu->scheduler->ready_queue);
 	setCurrentProcess(cpu->scheduler);
-	//printf("Process is set %d\n",setCurrentProcess(cpu->scheduler)); //Initialization.
+	
+	
+	//CPU RUN
+	setNextProcess(cpu);
+	printf("Process is set %d\n",cpu->process_pid);
 	
 	//state
 	printState(cpu);
 	
 	//calls the service
-	keyboardServiceRequest(cpu,cpu->scheduler);
+	keyboardServiceRequest(cpu);
 	
 	//state
 	printState(cpu);	

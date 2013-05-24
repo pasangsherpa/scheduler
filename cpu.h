@@ -12,10 +12,6 @@
 #ifndef CPU_H
 #define CPU_H
 
-#ifndef MEMORY_H
-#include "memory.h"
-#endif
-
 #ifndef SCHEDULER_H
 #include "scheduler.h"
 #endif
@@ -30,28 +26,38 @@
 
 
 typedef struct cpu {
-        int PC; //Program counter
-        MemoryPtr memory;
+        int PC; 				//Program counter
+		int max_step_count; 	//Number of steps this CPU will run.        
         SchedulerPtr scheduler;
-        int no_processes; //Number of processes
-        ProcessPtr *process_list;
-        int max_step_Count; //Number of steps this CPU will run.
-		Queue keyboard_queue;
+		int next_process;		//the code of the system service this cpu will call
+		int next_step;		//when the cpu will call the service 
+		int process_pid;
+		char buffer_data;
+		ProcessPtr current_process;	//currently running process pcb
+		int INT;				//whether INT is asserted
+		int IRQ;
+		int resume;		
         
 } CPUStr, *CPUPtr;
 
 // Constructor
-CPUPtr CPUConstructor(int no_processes, int prod_cons_pair, int cycle);
+CPUPtr CPUConstructor(int max_step_count);
 
 // Destructor
 int CPUDestructor(CPUPtr this);
 
 //METHODS
+//main thread
+void runCPU(CPUPtr this);
+void interruptCPU(CPUPtr this, int the_IRQ, char the_data);
 
-int keyboardServiceRequest(CPUPtr this, SchedulerPtr the_pcb);
-int keyboardServiceCompleted(CPUPtr this, char the_keyboard_data);
-void poll(CPUPtr this); //thread	
-int timer_int_handler(CPUPtr this,SchedulerPtr scheduler);
+//helper methods
+void saveState(CPUPtr this);
+void setNextProcess(CPUPtr this);
+
+void keyboardServiceRequest(CPUPtr this);
+void keyboardServiceCompleted(CPUPtr this);
+void getKey(CPUPtr this); //
 void printState(CPUPtr this);
 void printQueue(Queue the_queue);
 
@@ -59,7 +65,7 @@ void printQueue(Queue the_queue);
 //int mutex_lock_trap_handler(CPUPtr this,MutexPtr mutex); 
 //int mutex_unlock_trap_handler(CPUPtr this, ProcessPtr process); //assumption: we know which process
                                                                                                                                 //is waiting on which lock+ a process can only be in one queue.
-int cond_wait_trap_handler(CPUPtr this);//task:Condition pointer
-int cond_signal_trap_handler(CPUPtr this);
+//int cond_wait_trap_handler(CPUPtr this);//task:Condition pointer
+//int cond_signal_trap_handler(CPUPtr this);
 
 #endif /* CPU_H */
