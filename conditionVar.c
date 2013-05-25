@@ -30,7 +30,7 @@ ConditionVarPtr ConditionVarConstructor() {
 }
 
 void ConditionVarDestructor(ConditionVarPtr this) {
-	DisposeQueue(this -> mutex_queue);
+	DisposeQueue(this -> mutex);
 	MutexDestructor(this -> mutex);
 	free(this);
 }

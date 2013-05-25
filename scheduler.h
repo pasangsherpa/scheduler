@@ -20,17 +20,21 @@
 #include "process.h"
 #endif
 
+#ifndef MUTEX_H
+#include "mutex.h"
+#endif
+
 typedef struct scheduler {
 	Queue ready_queue;
 	Queue io_queue;
-	Queue mutex_queue;
+	MutexPtr mutex;
 
 	ProcessPtr current_process;
 
 	//pointers to functions
 	int (*destroy)(struct scheduler*);
 	int(*setCurrentProcess)(struct scheduler*);
-	ProcessPtr(*switchProcess)(struct scheduler*, int, int);
+	ProcessPtr(*switchProcess)(struct scheduler*, int*, int);
 	int(*addToQueue)(struct scheduler*, ProcessPtr, Queue);
 	ProcessPtr(*getCurrrentProcess)(struct scheduler*);
 
@@ -39,7 +43,7 @@ typedef struct scheduler {
 SchedulerPtr SchedulerConstructor(int max_processes);
 int SchedulerDestructor(SchedulerPtr this);
 int setCurrentProcess(SchedulerPtr this);
-ProcessPtr switchProcess(SchedulerPtr this, int pc, int interrupt);
+ProcessPtr switchProcess(SchedulerPtr this, int *pc, int interrupt);
 int addToQueue(SchedulerPtr this, ProcessPtr process, Queue Q);
 ProcessPtr getCurrentProcess(SchedulerPtr this);
 

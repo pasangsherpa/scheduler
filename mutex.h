@@ -9,10 +9,27 @@
  *
  */
 
- typedef struct {
- 	int mutex_ownerID;
- 	Queue mutex_queue;
- } Mutex, *MutexPtr;
+#ifndef PROCESS_H
+#include "process.h"
+#endif
+
+#ifndef GLOBAL_H
+#include "global.h"
+#endif
+
+typedef struct mutex {
+	int mutex_id;
+	ProcessPtr owner;
+	bool mutex_locked;
+	Queue mutex_queue;
+
+	//Pointers to functions
+	void(*setOwner)(struct mutex*, ProcessPtr);
+	ProcessPtr(*switchOwner)(struct mutex*);
+	void(*add)(struct mutex*, ProcessPtr);
+	void(*lock)(struct mutex*, bool);
+	bool(*isLocked)(struct mutex*);
+} Mutex, *MutexPtr;
 
 // Constructor
 MutexPtr MutexConstructor();
@@ -21,5 +38,8 @@ MutexPtr MutexConstructor();
 void MutexDestructor(MutexPtr);
 
 // Functions
-bool MutexIsLocked(MutexPtr);
-void MutexAdd(MutexPtr, int *);			// Adds an id (pointer) to the mutex queue.
+void setOwner(MutexPtr mutex, ProcessPtr p);
+ProcessPtr switchOwner(MutexPtr mutex);
+bool MutexIsLocked(MutexPtr mutex);
+void MutexLock(MutexPtr mutex, bool lock);
+void MutexAdd(MutexPtr mutex, ProcessPtr);

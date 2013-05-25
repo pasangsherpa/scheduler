@@ -48,6 +48,7 @@ int addToRequestArray(RequestPtr * req_array, int * num_array, int * proc_type, 
 	for(j = 0; j < the_length ; j++){
 		req_array[j] = RequestConstructor(proc_type[j],num_array[j]);		
 	}
+	return NO_ERROR;
 }
 
 int getNextTrapStep(ProcessPtr this){
