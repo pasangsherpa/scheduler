@@ -13,8 +13,7 @@
 #define SYSTEMTIMER_H
 
 typedef struct timer {
-	int count;								// The countdown variable for the clock.
-	bool quanta_finished;
+	CPUPtr cpu;
 	pthread_t clock_thread;
 
 } SysTimerStr, *SysTimerPtr;
@@ -40,14 +39,8 @@ void SysTimerDestructor(SysTimerPtr);
 ***** Functions *****
 *******************/
 
-// Resets the timer to the original Quanta.
-void STReset(SysTimerPtr);
-
-// Returns true if the Quanta has been reached.
-// To begin again, the timer will then need to be reset.
-bool STisQuantaFinished(SysTimerPtr);
-
-// The function that runs the clock
+// The function that runs the clock.
+// Called from constructor- shouldnt be called from anywhere else.
 void *SysTimerRun(void *);
 
 

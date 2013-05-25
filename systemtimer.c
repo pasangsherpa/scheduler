@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include "global.h"
+#include "cpu.h"
 #include "systemtimer.h"
 
 
@@ -22,10 +23,9 @@
 * Sets the boolean flag to false because the quanta has just started.
 * Creates a thread to run the timer.
 */
-SysTimerPtr SysTimerConstructor() {
+SysTimerPtr SysTimerConstructor(CPUPtr c) {
 	SysTimerPtr timer = (SysTimerPtr) malloc(sizeof(SysTimerStr));
-	timer -> count = QUANTA;
-	timer -> quanta_finished = false;
+	timer -> cpu = c;
 
 	pthread_create(&timer -> clock_thread, NULL, SysTimerRun, (void *) timer);
 	return timer;
@@ -42,22 +42,15 @@ void SysTimerDestructor(SysTimerPtr this) {
 
 void *SysTimerRun(void *args) {
 	SysTimerPtr timer = (SysTimerPtr) args;
-	if (timer -> count > 0) {		// Quanta not yet finished.
-		timer -> count--;
-	} else if (timer -> quanta_finished == false) {
-		timer -> quanta_finished = true;
+
+	while (true) {
+		sleep(QUANTA);
+		interruptCPU(timer -> cpu, TIMER_INT, '0');
 	}
 }
 
-void STReset(SysTimerPtr timer) {
-	timer -> count = QUANTA;
-	timer -> quanta_finished = false;
-}
-
-bool STisQuantaFinished(SysTimerPtr timer) {
-	return timer -> quanta_finished;
-}
 
 int main() {
-	SysTimerPtr timer = SysTimerConstructor();
+	CPUPtr cpu = CPUConstructor(10);
+	SysTimerPtr timer = SysTimerConstructor(cpu);
 }
