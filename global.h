@@ -17,6 +17,7 @@
 #define NO_ERROR			0
 #define ERROR				-1
 #define QUEUE_SIZE 			50
+#define QUANTA	100
 #define MAX_PROCESS			50
 typedef enum { false, true } bool;
 /******* END GENERAL ********/
@@ -44,9 +45,9 @@ typedef enum { false, true } bool;
 #define	AUDIO_SERVICE_REQ		6
 #define AUDIO_SERVICE_COMPLETED	7
 #define MUTEX_LOCK				8
-#define MUTEX_UNLOCK			9	
-#define COND_WAIT				10		
-#define COND_SIGNAL				11		
+#define MUTEX_UNLOCK			9
+#define COND_WAIT				10
+#define COND_SIGNAL				11
 /*******END KERNEL SERVICE***************************/
 
 /*******IRQ LINES***********/
