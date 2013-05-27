@@ -15,6 +15,8 @@
 typedef struct timer {
 	CPUPtr cpu;
 	pthread_t clock_thread;
+	pthread_cond_t reset;				// Condition variable CPU uses to signal timer.
+	pthread_mutex_t mutex;			// Unused mutex only for signaling.
 
 } SysTimerStr, *SysTimerPtr;
 
@@ -23,8 +25,10 @@ typedef struct timer {
 ** Constructor **
 ****************
 * Returns a pointer to the new System Timer and starts the timer.
+* reset - this condition variable needs to be signaled to start the clock running again
+*				after an interrupt.
 */
-SysTimerPtr SysTimerConstructor();
+SysTimerPtr SysTimerConstructor(CPUPtr, pthread_cond_t reset);
 
 /**************
 ** Destructor **

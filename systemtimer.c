@@ -14,18 +14,20 @@
 #include <pthread.h>
 #include "global.h"
 #include "cpu.h"
+//#include "TestCpu.h"				// For testing purposes.
 #include "systemtimer.h"
 
 
 /*
 * Basic Constructor for the system timer.
 * Initializes the count to the quanta set in global.h.
-* Sets the boolean flag to false because the quanta has just started.
 * Creates a thread to run the timer.
 */
-SysTimerPtr SysTimerConstructor(CPUPtr c) {
+SysTimerPtr SysTimerConstructor(CPUPtr c, pthread_cond_t condition) {
 	SysTimerPtr timer = (SysTimerPtr) malloc(sizeof(SysTimerStr));
 	timer -> cpu = c;
+	timer -> reset = condition;
+	timer -> mutex = PTHREAD_MUTEX_INITIALIZER;
 
 	pthread_create(&timer -> clock_thread, NULL, SysTimerRun, (void *) timer);
 	return timer;
@@ -46,11 +48,17 @@ void *SysTimerRun(void *args) {
 	while (true) {
 		sleep(QUANTA);
 		interruptCPU(timer -> cpu, TIMER_INT, '0');
+		pthread_cond_wait(&timer -> reset, &timer -> mutex);
 	}
 }
 
-
+/*
 int main() {
-	CPUPtr cpu = CPUConstructor(10);
-	SysTimerPtr timer = SysTimerConstructor(cpu);
+	pthread_cond_t reset = PTHREAD_COND_INITIALIZER;
+	TestCPUPtr cpu = TestCPUConstructor(10, reset);
+	SysTimerPtr timer = SysTimerConstructor(cpu, reset);
+
+	int i;
+	for (i = 0; i< 9999999999; i++) {}
 }
+*/

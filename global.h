@@ -17,7 +17,7 @@
 #define NO_ERROR			0
 #define ERROR				-1
 #define QUEUE_SIZE 			50
-#define QUANTA	1000
+#define QUANTA	1
 #define MAX_PROCESS			50
 typedef enum { false, true } bool;
 /******* END GENERAL ********/
