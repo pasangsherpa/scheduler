@@ -8,7 +8,9 @@
  *  @author: Mars Gokturk
  *
  */
-
+#ifndef MUTEX_H
+#define MUTEX_H
+ 
 #ifndef PROCESS_H
 #include "process.h"
 #endif
@@ -18,17 +20,17 @@
 #endif
 
 typedef struct mutex {
-	int mutex_id;
-	ProcessPtr owner;
-	bool mutex_locked;
-	Queue mutex_queue;
+        int mutex_id;
+        ProcessPtr owner;
+        bool mutex_locked;
+        Queue mutex_queue;
 
-	//Pointers to functions
-	void(*setOwner)(struct mutex*, ProcessPtr);
-	ProcessPtr(*switchOwner)(struct mutex*);
-	void(*add)(struct mutex*, ProcessPtr);
-	void(*lock)(struct mutex*, bool);
-	bool(*isLocked)(struct mutex*);
+        //Pointers to functions
+        void(*setOwner)(struct mutex*, ProcessPtr);
+        ProcessPtr(*switchOwner)(struct mutex*);
+        void(*add)(struct mutex*, ProcessPtr);
+        void(*lock)(struct mutex*, bool);
+        bool(*isLocked)(struct mutex*);
 } Mutex, *MutexPtr;
 
 // Constructor
@@ -43,3 +45,7 @@ ProcessPtr switchOwner(MutexPtr mutex);
 bool MutexIsLocked(MutexPtr mutex);
 void MutexLock(MutexPtr mutex, bool lock);
 void MutexAdd(MutexPtr mutex, ProcessPtr);
+void Mutex_Lock(MutexPtr mutex, ProcessPtr process, SchedulerPtr scheduler);
+void Mutex_Unlock(MutexPtr mutex, ProcessPtr process, SchedulerPtr scheduler);
+
+#endif
