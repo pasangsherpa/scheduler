@@ -20,6 +20,10 @@
 #include "scheduler.h"
 #endif
 
+#ifndef MUTEX_H
+#include "mutex.h"
+#endif
+
  typedef struct{
 	int id;
 	Queue queue;	

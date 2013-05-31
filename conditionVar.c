@@ -30,7 +30,7 @@ void condition_wait(ConditionPtr this, MutexPtr mutex, SchedulerPtr scheduler){
 	MutexLock(mutex, false);
 	PairPtr pair = constructPair(scheduler->current_process,mutex);
 	Enqueue(pair,this->queue);	
-	switchProcess(scheduler, &scheduler->current_process->pcb->next_step, 10);//upcall to the
+	switchProcess(scheduler, &scheduler->current_process->pcb->next_step, 10, NULL);//upcall to the
 												//scheduler(scheduler removes the process
 												//from the ready queue)
 												//cpu runs a new process.
