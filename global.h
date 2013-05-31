@@ -64,6 +64,11 @@ typedef enum { false, true } bool;
 #define VIDEO_P		1
 /*******INT PRIORITY LEVELS***/
 
+/*******CONDITION VARIABLES****/
+#define NOT_FULL	1
+#define NOT_EMPTY	0
+/*******CONDITION VARIABLES***/
+
 
 #endif /* GLOBAL_H */
 
