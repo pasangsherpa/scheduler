@@ -8,29 +8,50 @@
  *  @author: Mars Gokturk
  *
  */
-
- #include <stdio.h>
- #include <stdlib.h>
- #include "global.h"
- #include "queue.h"
-#include "mutex.h"
+ 
 #include "conditionVar.h"
 
-/*
-* ConditionVarPtr ConditionVarConstructor()
-* Basic Constructor for a Condition Variable object.
-*/
-ConditionVarPtr ConditionVarConstructor() {
-	ConditionVarPtr conditionVar = (ConditionVarPtr) malloc(sizeof(ConditionVar));
-	conditionVar -> mutex = (MutexPtr) MutexConstructor();
+#ifndef PAIR_C
+#include "pair.h"
+#endif
 
-	conditionVar -> wait_queue = (Queue) CreateQueue(QUEUE_SIZE);
-
-	return conditionVar;
+//Limit of the queue, and the id of this condition variable{NOT_FULL,NOT_EMPTY}
+ConditionPtr ConditionConstructor(int limit, int ID){
+	ConditionPtr condition = (ConditionPtr) malloc(sizeof(ConditionStr));
+	condition->queue = (Queue)CreateQueue(limit);
+	condition->id = ID;
+	
+	return condition;
+}
+//This method unlocks the process' mutex, adds the process to the condition's queue,
+// and upcalls the scheduler.
+void condition_wait(ConditionPtr this, MutexPtr mutex, SchedulerPtr scheduler){	
+	//CPU saves this process' state before executing this method.	
+	MutexLock(mutex, false);
+	PairPtr pair = constructPair(scheduler->current_process,mutex);
+	Enqueue(pair,this->queue);	
+	switchProcess(scheduler, &scheduler->current_process->pcb->next_step, 10);//upcall to the
+												//scheduler(scheduler removes the process
+												//from the ready queue)
+												//cpu runs a new process.
 }
 
-void ConditionVarDestructor(ConditionVarPtr this) {
-	DisposeQueue(this -> mutex);
-	MutexDestructor(this -> mutex);
+//This method removes the first process from the given condition's queue, 
+//and adds it to the process' mutex queue.
+void condition_signal(ConditionPtr this){
+	if(isEmpty(this->queue) == false){
+		PairPtr pair = FrontAndDequeue(this->queue);
+		MutexAdd(pair->lock, pair->p);
+	}
+}
+
+void ConditionDeconstructor(ConditionPtr this){
+	DisposeQueue(this->queue);
 	free(this);
 }
+
+int getConditionID(ConditionPtr this){
+	return this->id;
+}
+
+	

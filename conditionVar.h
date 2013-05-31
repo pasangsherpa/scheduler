@@ -9,13 +9,27 @@
  *
  */
 
- typedef struct {
- 	MutexPtr mutex;
- 	Queue wait_queue;
- } ConditionVar, *ConditionVarPtr;
+#ifndef CONDITION_H
+#define CONDITION_H
 
-// Constructor
-ConditionVarPtr ConditionVarConstructor();
+#ifndef GLOBAL_H
+#include "global.h"
+#endif
 
-// Destructor
-void ConditionVarDestructor(MutexPtr);
+#ifndef SCHEDULER_H
+#include "scheduler.h"
+#endif
+
+ typedef struct{
+	int id;
+	Queue queue;	
+}ConditionStr;
+typedef ConditionStr * ConditionPtr;
+
+ConditionPtr ConditionConstructor(int limit, int ID);
+void condition_wait(ConditionPtr this, MutexPtr mutex, SchedulerPtr scheduler);
+void condition_signal(ConditionPtr this);
+void ConditionDeconstructor(ConditionPtr this);
+int getConditionID(ConditionPtr this);
+
+#endif
