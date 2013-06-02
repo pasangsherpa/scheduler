@@ -50,6 +50,7 @@ void *SysTimerRun(void *args) {
 		interruptCPU(timer -> cpu, TIMER_INT, '0');
 		pthread_cond_wait(&timer -> reset, &timer -> mutex);
 	}
+	return timer;
 }
 
 /*

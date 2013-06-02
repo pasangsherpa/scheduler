@@ -24,6 +24,9 @@
 #include "pcb.h"
 #endif
 
+#ifndef SYSTIMER_H
+#include "systemtimer.h"
+#endif
 
 typedef struct cpu {
         int PC; 				//Program counter
@@ -37,6 +40,8 @@ typedef struct cpu {
 		int INT;				//whether INT is asserted
 		int IRQ;
 		int resume;		
+		SysTimerPtr timer;
+		pthread_mutex_t reset;
         
 } CPUStr, *CPUPtr;
 

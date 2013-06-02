@@ -25,13 +25,14 @@ CPUPtr CPUConstructor() {
 		result->resume = 0;									//may not be necessary
 		result->buffer_data = '0';							//buffer	
 		result->process_pid = 0;							//current process pid
-
 		return result;
 }
 
 //Initialize CPU.
 void initCPU (CPUPtr this, int totalProcess, int totalKBProcess, int totalIOprocess,
 		int totalPrCoProcess, int totalComputeProcess, int the_max_step_count) {
+	this->reset = PTHREAD_COND_INITIALIZER;
+	this->timer = SysTimerConstructor(this, this->reset);
 	this->scheduler = SchedulerConstructor(totalProcess);//process scheduler
 	this->max_step_count = the_max_step_count;		//max steps this CPU will run
 
@@ -94,6 +95,7 @@ void interruptCPU(CPUPtr this, int the_IRQ, char the_data){
 CPU thread runs as long as there are more steps to run.
 */
 void runCPU(CPUPtr this){ 					//main thread.//assumes that the fields are set
+	SysTimerRun(this->timer);
 	while(this->max_step_count > 0 && this->resume ==1){	
 		this->max_step_count--;//decrement the max step
 		this->PC--;
