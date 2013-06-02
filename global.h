@@ -25,10 +25,11 @@ typedef enum { false, true } bool;
 /********* PROCESS **********/
 //Process Type
 #define COMPUTE 			0
-#define IO 					1
-#define KEYBOARD 			2
-#define PRODUCER			3
-#define CONSUMER			4
+#define KEYBOARD 			1
+#define PRODUCER			2
+#define CONSUMER			3
+#define IO_AUDIO				4
+#define IO_VIDEO 			5
 //Process State
 #define RUNNING 			0
 #define	READY				1

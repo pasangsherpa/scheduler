@@ -39,9 +39,29 @@ ProcessPtr ProcessConstructor(int pid, int proc_type, int no_steps, int no_reque
 			r = rand() % no_steps;
 		   	step_array[i] = r;
 
-		   	// Only for the time being.
-		   	// More robust code_array needs to be made.
-		   	code_array[i] = VIDEO_SERVICE_REQ;
+			case IO_AUDIO:
+				code_array[i] = AUDIO_SERVICE_REQ;
+				break;
+
+			case IO_VIDEO:
+				code_array[i] = VIDEO_SERVICE_REQ;
+				break;
+
+			case KEYBOARD:
+				code_array[i] = KEYBOARD_SERVICE_REQ;
+				break;
+
+			case PRODUCER:
+				// Needs to be filled in.
+				break;
+
+			case CONSUMER:
+				// Needs to be filled in.
+				break;
+
+			default:
+				printf("\nInvalid process type!\n");
+				break;
 		}
 		addToRequestArray(process->requests, step_array, code_array, process->no_requests);
 	}
@@ -91,7 +111,8 @@ int run(ProcessPtr this) {
 		case COMPUTE:
 			//Create a compute process.
 			break;
-		case IO:
+		case IO_AUDIO:
+		case IO_VIDEO:
 			//Create a IO process.
 			break;
 		case KEYBOARD:
@@ -149,7 +170,7 @@ int main(void){
 	*/
 
 	// Test random generator.
-	ProcessPtr process2 = ProcessConstructor(222, IO, 100, 9);
+	ProcessPtr process2 = ProcessConstructor(222, IO, 100, 5);
 	int i;
 	for(i = 0; i < 10; i++){
 
