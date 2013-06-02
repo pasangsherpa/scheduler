@@ -15,6 +15,10 @@
 #include "process.h"
 #endif
 
+#ifndef SCHEDULER_H
+#include "scheduler.h"
+#endif
+
 #ifndef GLOBAL_H
 #include "global.h"
 #endif

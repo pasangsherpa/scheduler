@@ -39,29 +39,30 @@ ProcessPtr ProcessConstructor(int pid, int proc_type, int no_steps, int no_reque
 			r = rand() % no_steps;
 		   	step_array[i] = r;
 
-			case IO_AUDIO:
-				code_array[i] = AUDIO_SERVICE_REQ;
-				break;
 
-			case IO_VIDEO:
-				code_array[i] = VIDEO_SERVICE_REQ;
-				break;
-
-			case KEYBOARD:
-				code_array[i] = KEYBOARD_SERVICE_REQ;
-				break;
-
-			case PRODUCER:
-				// Needs to be filled in.
-				break;
-
-			case CONSUMER:
-				// Needs to be filled in.
-				break;
-
-			default:
-				printf("\nInvalid process type!\n");
-				break;
+//			case IO_AUDIO:
+//				code_array[i] = AUDIO_SERVICE_REQ;
+//				break;
+//
+//			case IO_VIDEO:
+//				code_array[i] = VIDEO_SERVICE_REQ;
+//				break;
+//
+//			case KEYBOARD:
+//				code_array[i] = KEYBOARD_SERVICE_REQ;
+//				break;
+//
+//			case PRODUCER:
+//				// Needs to be filled in.
+//				break;
+//
+//			case CONSUMER:
+//				// Needs to be filled in.
+//				break;
+//
+//			default:
+//				printf("\nInvalid process type!\n");
+//				break;
 		}
 		addToRequestArray(process->requests, step_array, code_array, process->no_requests);
 	}
@@ -130,56 +131,56 @@ int run(ProcessPtr this) {
 	return NO_ERROR;
 }
 
-int main(void){
-
-	//test for Requests:
-	//main creates an array of request step no's and an array of trap codes
-
-	int  * step_array = malloc(4 * sizeof(int));  //main generates the random nums.
-	int  * code_array = malloc(4 * sizeof(int));
-
-	step_array[0] = 1;
-	step_array[1] = 8;
-	step_array[2] = 3;
-	step_array[3] = 9;
-	code_array[0] = 2;
-	code_array[1] = 4;
-	code_array[2] = 6;
-	code_array[3] = 8;
-
-
-	//main calls the process constructor
-	//Process type:I/0
-	//Num of calls = 4
-	//Step nums: 1,8,3,9
-	//Trap codes: 2,4,6,8
-	//number of total steps:10
-	ProcessPtr process =  ProcessConstructor(111, IO, 10, 4) ;
-
-	//set requests array
-	addToRequestArray(process->requests, step_array, code_array, process->no_requests);
-
-	//get next step num
-	/*
-	int i;
-	for(i = 0; i < 10; i++){
-
-		printf("Next trap code: %d\n", getNextTrapCode(process));
-		printf("Next step: %d \n", getNextTrapStep(process));
-	}
-	*/
-
-	// Test random generator.
-	ProcessPtr process2 = ProcessConstructor(222, IO, 100, 5);
-	int i;
-	for(i = 0; i < 10; i++){
-
-			printf("Next trap code: %d\n", getNextTrapCode(process2));
-			printf("Next step: %d \n", getNextTrapStep(process2));
-	}
-
-	return 0;
-}
+//int main(void){
+//
+//	//test for Requests:
+//	//main creates an array of request step no's and an array of trap codes
+//
+//	int  * step_array = malloc(4 * sizeof(int));  //main generates the random nums.
+//	int  * code_array = malloc(4 * sizeof(int));
+//
+//	step_array[0] = 1;
+//	step_array[1] = 8;
+//	step_array[2] = 3;
+//	step_array[3] = 9;
+//	code_array[0] = 2;
+//	code_array[1] = 4;
+//	code_array[2] = 6;
+//	code_array[3] = 8;
+//
+//
+//	//main calls the process constructor
+//	//Process type:I/0
+//	//Num of calls = 4
+//	//Step nums: 1,8,3,9
+//	//Trap codes: 2,4,6,8
+//	//number of total steps:10
+//	ProcessPtr process =  ProcessConstructor(111, IO, 10, 4) ;
+//
+//	//set requests array
+//	addToRequestArray(process->requests, step_array, code_array, process->no_requests);
+//
+//	//get next step num
+//	/*
+//	int i;
+//	for(i = 0; i < 10; i++){
+//
+//		printf("Next trap code: %d\n", getNextTrapCode(process));
+//		printf("Next step: %d \n", getNextTrapStep(process));
+//	}
+//	*/
+//
+//	// Test random generator.
+//	ProcessPtr process2 = ProcessConstructor(222, IO, 100, 5);
+//	int i;
+//	for(i = 0; i < 10; i++){
+//
+//			printf("Next trap code: %d\n", getNextTrapCode(process2));
+//			printf("Next step: %d \n", getNextTrapStep(process2));
+//	}
+//
+//	return 0;
+//}
 
 
 

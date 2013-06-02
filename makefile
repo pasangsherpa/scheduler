@@ -16,7 +16,7 @@ process.o : process.c process.h pcb.h global.h
 pcb.o : pcb.c pcb.h global.h
 	$(CC) $(CFLAGS) pcb.c
 	
-mutex.o : mutex.c mutex.h process.h global.h
+mutex.o : mutex.c mutex.h process.h scheduler.h global.h
 	$(CC) $(CFLAGS) mutex.c
 	
 request.o : request.c request.h 

@@ -8,10 +8,11 @@
  *
  */
  
-# include <stdio.h>
-# include <strings.h>
-# include <stdlib.h>
+#include <stdio.h>
+#include <strings.h>
+#include <stdlib.h>
 #include <time.h>
+#include "cpu.h"
 
 #define MINIMUM_NUM_PROCESS 1	//MIN NUM OF PROCESS TO RUN FOR EACH TYPE OF THE PROCESS.
 #define MAX_NUM_STEPS_TO_RUN 1234567890	// MAX NUMBER OF TOTAL STEPS THIS PROGRAM WILL RUN.
@@ -35,13 +36,13 @@ int generateRandomNumber(int min, int max){
 This method creates a processor thread with a random step number in a range(total step number of CPU),
 and generates random instruction number to make service calls.
 */
-thread generateProcessThread(int totalStepNum, int type){
+//thread generateProcessThread(int totalStepNum, int type){
 	//generate random number of steps in range of totalStepNum
 	//set/generate number of service calls
 	//generate random instruction number to make the service call.
 	//create thread
 	//start thread.
-}
+//}
 
 /**
 This program expects arguments in this format:
@@ -55,13 +56,13 @@ int main(int argc, char * argv[]){
 	int pr_coProcess = 0;	
 	int computeBound = 0;
 	int stepCount = 0;
-	
+	int i;
     if(argc != 10){
 		printf("Please run the program again in this format:\n ./scheduler -p X -k X -io X -pc X X\nX implies an integer.");
 		return 1;
 	}
 		
-	for(int i = 1 ; i < argc-1; i+=2){	
+	for(i = 1 ; i < argc-1; i+=2){
 			
 			if(strcasecmp("-p", argv[i]) == 0){			
 				processNumber = atoi(argv[i+1]);
@@ -102,6 +103,9 @@ int main(int argc, char * argv[]){
 		//main returns when CPU returns.(thread join)
 	
 	
+//	CPUPtr cpu = CPUConstructor(stepCount);
+
+
 		
 	return 0;
 	

@@ -14,11 +14,9 @@
 #include "global.h"
 #endif
 
-CPUPtr CPUConstructor(int the_max_step_count) {
+CPUPtr CPUConstructor() {
 		CPUPtr result = (CPUPtr) malloc(sizeof(CPUStr));
 		result->PC = 0;										//current process' PC										
-		result->max_step_count = the_max_step_count;		//max steps this CPU will run
-		result->scheduler = SchedulerConstructor(MAX_PROCESS);//process scheduler				
 		result->next_process = 0;							//next service call address in the trap vector
 		result->next_step=0;								//next PC when currently running process will be preemted.		
 		result->current_process = NULL;						//currently running process
@@ -30,6 +28,46 @@ CPUPtr CPUConstructor(int the_max_step_count) {
 
 		return result;
 }
+
+//Initialize CPU.
+void initCPU (CPUPtr this, int totalProcess, int totalKBProcess, int totalIOprocess,
+		int totalPrCoProcess, int totalComputeProcess, int the_max_step_count) {
+	this->scheduler = SchedulerConstructor(totalProcess);//process scheduler
+	this->max_step_count = the_max_step_count;		//max steps this CPU will run
+
+	//Setup all processes
+	int i;
+	int pid = 0;
+	for (i = 0; i < totalKBProcess; i++) {
+		ProcessPtr kbp = ProcessConstructor(pid, KEYBOARD, 300, 100); // 300 & 100 dummy values
+		this->scheduler->addToQueue(this->scheduler, kbp, this->scheduler->ready_queue);
+		pid++;
+	}
+
+	for (i = 0; i < totalIOProcess; i++) {
+		int processtype = IO_AUDIO;
+		if (i % 2 == 1) processtype = IO_VIDEO; // Create IO_VIDEO every other number.
+		ProcessPtr iop = ProcessConstructor(pid, processtype, 300, 100);
+		this->scheduler->addToQueue(this->scheduler, iop, this->scheduler->ready_queue);
+		pid++;
+	}
+
+	for (i = 0; i < totalPrCOProcess; i++) {
+		int processtype = PRODUCER;
+		if (i % 2 == 1) processtype = CONSUMER;
+		ProcessPtr prcp = ProcessConstructor(pid, processtype, 300, 100);
+		this->scheduler->addToQueue(this->scheduler, prcp, this->scheduler->ready_queue);
+		pid++;
+	}
+
+	//Load first process in the scheduler.
+	this->scheduler->setCurrentProcess(this->scheduler);
+	//set the currect process in cpu.
+	this->current_process = this->scheduler->getCurrrentProcess(this->scheduler);
+}
+
+
+
 
 /*
 Context switch: CPU's context is switched to the next process selected by the process scheduler.
@@ -124,6 +162,8 @@ void runCPU(CPUPtr this){ 					//main thread.//assumes that the fields are set
 					printf("TRAP not recognized");
 			}
 		}
+
+		//run current process here???
 	}
 	//kill cpu
 }
@@ -137,7 +177,7 @@ void keyboardServiceRequest(CPUPtr this){ //a key press should trigger this meth
 		printf("------------------I/O REQUEST---------------------\n");
 		printf("Process PID = %d requested a keyboard service.\n",this->process_pid);
 		printf("Process PID = %d's PC = %d has been saved to its PCB\n",this->process_pid,this->PC);		
-		switchProcess(this->scheduler, this->PC, 4);
+		switchProcess(this->scheduler, &this->PC, 4, NULL);
 		setNextProcess(this);
 		printf("Process PID = %d - running\n", this->process_pid);	
 		printf("------------------I/O REQUEST---------------------\n");
@@ -150,7 +190,7 @@ void keyboardServiceCompleted(CPUPtr this){
 	printf("------------------I/O INT---------------------\n");
 	printf("I/O Completion Interrupt[Keyboard Device with IRQ = %d]\n", IRQ_KEYBOARD);
 	//get the pid of the process(I/O queue) from the scheduler.
-	switchProcess(this->scheduler, this->PC, 5);
+	switchProcess(this->scheduler, &this->PC, 5, NULL);
 	printf("Key pressed =  %c\n",this->buffer_data);
 	printf("P%d- running\n",this->process_pid);
 	printf("------------------I/O INT---------------------\n");	
@@ -220,76 +260,76 @@ void printQueue(Queue the_queue){
 	}
 }
 
-int main (void){
-
-	//Test Case: A Process calls a keyboard service.
-	//State of the program 
-	//Pressed key is printed out.
-	//Context switch
-	
-	//Initial prep
-	//CPU
-	CPUPtr cpu = CPUConstructor(30);	
-
-	//Construct 2 Processes
-		
-		//main creates an array of request step no's and an array of trap codes
-		
-		int  * step_array = malloc(4 * sizeof(int));  //main generates the random nums.
-		int  * code_array = malloc(4 * sizeof(int));
-	
-			step_array[0] = 1;
-			step_array[1] = 8;
-			step_array[2] = 3;
-			step_array[3] = 9;
-			code_array[0] = 4;
-			code_array[1] = 6;
-			code_array[2] = 8;
-			code_array[3] = 4;
-	
-	
-		//main calls the process constructor
-			//Process type:I/0
-			//Num of calls = 4
-			//Step nums: 1,8,3,9
-			//Trap codes: 2,4,6,8
-			//number of total steps:10
-		ProcessPtr process1 =  ProcessConstructor(111, IO, 10, 4) ;
-	
-		//set requests array
-		addToRequestArray(process1->requests, step_array, code_array, process1->no_requests);
-	
-	
-			//Process type:I/0
-			//Num of calls = 4
-			//Step nums: 3,5,1,9
-			//Trap codes: 8,9,10,11
-			//number of total steps:10
-			step_array[0] = 3;
-			step_array[1] = 5;
-			step_array[2] = 1;
-			step_array[3] = 9;
-			code_array[0] = 8;
-			code_array[1] = 9;
-			code_array[2] = 10;
-			code_array[3] = 11;
-	
-			ProcessPtr process2 = ProcessConstructor(222,IO,10,4);			
-			addToRequestArray(process2->requests, step_array, code_array, process2->no_requests);			
-			
-			
-				 
-	 //main adds the processes to the scheduler's queue.
-		addToQueue(cpu->scheduler, process1, cpu->scheduler->ready_queue);
-		addToQueue(cpu->scheduler, process2, cpu->scheduler->ready_queue);
-		
-	//get CPU's initial process to run.
-		setCurrentProcess(cpu->scheduler);
-		setNextProcess(cpu); //load selected process state to the cpu.
-	
-	//CPU RUN
-	runCPU(cpu);
-	
-	
-	return 0;
-}
+//int main (void){
+//
+//	//Test Case: A Process calls a keyboard service.
+//	//State of the program
+//	//Pressed key is printed out.
+//	//Context switch
+//
+//	//Initial prep
+//	//CPU
+//	CPUPtr cpu = CPUConstructor(30);
+//
+//	//Construct 2 Processes
+//
+//		//main creates an array of request step no's and an array of trap codes
+//
+//		int  * step_array = malloc(4 * sizeof(int));  //main generates the random nums.
+//		int  * code_array = malloc(4 * sizeof(int));
+//
+//			step_array[0] = 1;
+//			step_array[1] = 8;
+//			step_array[2] = 3;
+//			step_array[3] = 9;
+//			code_array[0] = 4;
+//			code_array[1] = 6;
+//			code_array[2] = 8;
+//			code_array[3] = 4;
+//
+//
+//		//main calls the process constructor
+//			//Process type:I/0
+//			//Num of calls = 4
+//			//Step nums: 1,8,3,9
+//			//Trap codes: 2,4,6,8
+//			//number of total steps:10
+//		ProcessPtr process1 =  ProcessConstructor(111, IO, 10, 4) ;
+//
+//		//set requests array
+//		addToRequestArray(process1->requests, step_array, code_array, process1->no_requests);
+//
+//
+//			//Process type:I/0
+//			//Num of calls = 4
+//			//Step nums: 3,5,1,9
+//			//Trap codes: 8,9,10,11
+//			//number of total steps:10
+//			step_array[0] = 3;
+//			step_array[1] = 5;
+//			step_array[2] = 1;
+//			step_array[3] = 9;
+//			code_array[0] = 8;
+//			code_array[1] = 9;
+//			code_array[2] = 10;
+//			code_array[3] = 11;
+//
+//			ProcessPtr process2 = ProcessConstructor(222,IO,10,4);
+//			addToRequestArray(process2->requests, step_array, code_array, process2->no_requests);
+//
+//
+//
+//	 //main adds the processes to the scheduler's queue.
+//		addToQueue(cpu->scheduler, process1, cpu->scheduler->ready_queue);
+//		addToQueue(cpu->scheduler, process2, cpu->scheduler->ready_queue);
+//
+//	//get CPU's initial process to run.
+//		setCurrentProcess(cpu->scheduler);
+//		setNextProcess(cpu); //load selected process state to the cpu.
+//
+//	//CPU RUN
+//	runCPU(cpu);
+//
+//
+//	return 0;
+//}

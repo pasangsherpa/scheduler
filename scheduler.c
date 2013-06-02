@@ -136,7 +136,7 @@ void testScheduler(SchedulerPtr this) {
 	printf("Testing\n");
 	ProcessPtr p1 = ProcessConstructor(001, COMPUTE, 50, 10);
 	p1->pcb->state = RUNNING;
-	ProcessPtr p2 = ProcessConstructor(002, IO, 50, 10);
+	ProcessPtr p2 = ProcessConstructor(002, IO_AUDIO, 50, 10);
 	p2->pcb->state = INTERRUPTED;
 	ProcessPtr p3 = ProcessConstructor(003, KEYBOARD, 50, 10);
 	p3->pcb->state = BLOCKED;
@@ -198,9 +198,9 @@ void testScheduler(SchedulerPtr this) {
 
 }
 
-int main(void) {
-	SchedulerPtr slr = SchedulerConstructor(10);
-	testScheduler(slr);
-
-	return 0;
-}
+//int main(void) {
+//	SchedulerPtr slr = SchedulerConstructor(10);
+//	testScheduler(slr);
+//
+//	return 0;
+//}
