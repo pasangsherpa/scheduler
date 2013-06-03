@@ -78,5 +78,6 @@ int printMessage(ProcessPtr this);
 *** HELPER FUNCTIONS ***
 ***************************/
 int addToRequestArray(RequestPtr * req_array, int * num_array, int * proc_type, int the_length);
+char* decodeProcessType(int process_type);
 
 #endif /* PROCESS_H */

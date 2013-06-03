@@ -39,7 +39,6 @@ typedef struct cpu {
 		ProcessPtr current_process;	//currently running process pcb
 		int INT;				//whether INT is asserted
 		int IRQ;
-		int resume;		
 		SysTimerPtr timer;
 		pthread_cond_t reset;
         
