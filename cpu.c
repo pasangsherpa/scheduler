@@ -133,7 +133,7 @@ void runCPU(CPUPtr this){ 					//main thread.//assumes that the fields are set
 
 		if(this->PC == getNextTrapStep(this -> current_process) {		//time to make a service call
 			printMessage(this ->current_process);
-			advance_request()
+			advanceRequest(this -> current_process);
 			interruptCPU(this, getNextTrapCode(this ->current_process), '0');
 
 			/*
