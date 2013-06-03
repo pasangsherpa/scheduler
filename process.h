@@ -32,10 +32,45 @@ typedef struct process {
 	int req_index;		//keeps track of the next call and step num.
 } ProcessStr, *ProcessPtr;
 
+/****************************************************************************
+*Basic Constructor
+***********************
+* pid = the ID number for the process.
+* proc_type = the type of process (see global.h).
+* no_steps = the total number of steps the process takes to complete.
+* no_requests = the total number of request the process will make before completion.
+***************************************************************************/
 ProcessPtr ProcessConstructor(int pid, int proc_type, int no_steps, int no_requests);
+
+// Basic Destructor
 int ProcessDestructor(ProcessPtr this);
-int run(ProcessPtr this);
-int addToRequestArray(RequestPtr * req_array, int * num_array, int * proc_type, int the_length);
+
+/***************************
+*** FUNCTIONS ***********
+***************************/
+
+// Returns the step number of when the next interrupt will occur.
 int getNextTrapStep(ProcessPtr this);
+
+// Returns the trap code (see glabal.h) of the next interrupt.
 int getNextTrapCode(ProcessPtr this);
+
+// Advances the request array.
+// Loops around if at the end of the array.
+// This function should be called every time the PC == getNextTrapStep.
+void advanceRequest(ProcessPtr this);
+
+// The PC of the cpu is passed in.
+// Retuns true if the PC is greater than or equal to no_steps.
+bool isProcessDone(ProcessPtr this, int PC);
+
+// Prints the predefined interrupt message for the process.
+// Returns NO_ERROR if successful.
+int printMessage(ProcessPtr this);
+
+/***************************
+*** HELPER FUNCTIONS ***
+***************************/
+int addToRequestArray(RequestPtr * req_array, int * num_array, int * proc_type, int the_length);
+
 #endif /* PROCESS_H */

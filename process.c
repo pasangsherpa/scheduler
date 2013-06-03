@@ -39,30 +39,31 @@ ProcessPtr ProcessConstructor(int pid, int proc_type, int no_steps, int no_reque
 			r = rand() % no_steps;
 		   	step_array[i] = r;
 
+		   	switch (proc_type) {
 
-//			case IO_AUDIO:
-//				code_array[i] = AUDIO_SERVICE_REQ;
-//				break;
-//
-//			case IO_VIDEO:
-//				code_array[i] = VIDEO_SERVICE_REQ;
-//				break;
-//
-//			case KEYBOARD:
-//				code_array[i] = KEYBOARD_SERVICE_REQ;
-//				break;
-//
-//			case PRODUCER:
-//				// Needs to be filled in.
-//				break;
-//
-//			case CONSUMER:
-//				// Needs to be filled in.
-//				break;
-//
-//			default:
-//				printf("\nInvalid process type!\n");
-//				break;
+				case IO_AUDIO:
+					  code_array[i] = AUDIO_SERVICE_REQ;
+					  break;
+
+				case IO_VIDEO:
+					  code_array[i] = VIDEO_SERVICE_REQ;
+					  break;
+
+				case KEYBOARD:
+					  code_array[i] = KEYBOARD_SERVICE_REQ;
+					  break;
+
+				case PRODUCER:
+					  // Needs to be filled in.
+					  break;
+
+				case CONSUMER:
+					  // Needs to be filled in.
+					  break;
+
+				default:
+				 	printf("\nInvalid process type!\n");
+  					break;
 		}
 		addToRequestArray(process->requests, step_array, code_array, process->no_requests);
 	}
@@ -93,40 +94,59 @@ int addToRequestArray(RequestPtr * req_array, int * num_array, int * proc_type, 
 	return NO_ERROR;
 }
 
-int getNextTrapStep(ProcessPtr this){
-	int result =  getRequestStep(this->requests[this->req_index]);
-	this->req_index = (this->req_index +1 ) % this->no_requests;
-	return result;
+int getNextTrapStep(ProcessPtr this) {
+	return  getRequestStep(this->requests[this->req_index]);
 }
 
-int getNextTrapCode(ProcessPtr this){
+int getNextTrapCode(ProcessPtr this) {
 	 return getRequestType(this->requests[this->req_index]);
 }
 
+bool isProcessDone(ProcessPtr this, int PC) {
+	bool result = false;
 
-//Run the process depending on its type.
-int run(ProcessPtr this) {
+	if (this -> no_steps >= PC) {
+		result = true;
+	}
+	return result;
+}
+
+void advanceRequest(ProcessPtr this) {
+	this->req_index = (this->req_index +1 ) % this->no_requests;
+}
+
+int printMessage(ProcessPtr this) {
 	int type = this->proc_type;
 
-	switch (type) {
-		case COMPUTE:
-			//Create a compute process.
-			break;
-		case IO_AUDIO:
-		case IO_VIDEO:
-			//Create a IO process.
-			break;
-		case KEYBOARD:
-			//Create a Keyboard process.
-			break;
-		case PRODUCER:
-			//Create a Producer process.
-			break;
-		case CONSUMER:
-			//Create a Consumer process.
-			break;
-		default:
-			break;
+		switch (type) {
+
+			case COMPUTE:
+				printf("\nComputing");
+				break;
+
+			case IO_AUDIO:
+				printf("\nIO Interrupt (Audio)");
+				break;
+
+			case IO_VIDEO:
+				printf("\nIO Interrupt (Video)");
+				break;
+
+			case KEYBOARD:
+				printf("\nKeyboard Interrupt");
+				break;
+
+			case PRODUCER:
+				printf("\nProducer Interrupt");
+				break;
+
+			case CONSUMER:
+				printf("\nConsumer Interrupt");
+				break;
+
+			default:
+				return ERROR;
+				break;
 	}
 	return NO_ERROR;
 }
