@@ -55,7 +55,7 @@ int CPUDestructor(CPUPtr this);
 //main thread
 void runCPU(CPUPtr this);
 void interruptCPU(CPUPtr this, int the_IRQ, char the_data);
-void initCPU (CPUPtr this, int totalProcess, int totalKBProcess, int totalIOprocess,
+void initCPU (CPUPtr this, int totalProcess, int totalKBProcess, int totalIOProcess,
 		int totalPrCoProcess, int totalComputeProcess, int the_max_step_count);
 //helper methods
 void saveState(CPUPtr this);

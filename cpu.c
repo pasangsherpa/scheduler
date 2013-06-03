@@ -29,7 +29,7 @@ CPUPtr CPUConstructor() {
 }
 
 //Initialize CPU.
-void initCPU (CPUPtr this, int totalProcess, int totalKBProcess, int totalIOprocess,
+void initCPU (CPUPtr this, int totalProcess, int totalKBProcess, int totalIOProcess,
 		int totalPrCoProcess, int totalComputeProcess, int the_max_step_count) {
 	this->reset = PTHREAD_COND_INITIALIZER;
 	this->scheduler = SchedulerConstructor(totalProcess);//process scheduler
@@ -52,7 +52,7 @@ void initCPU (CPUPtr this, int totalProcess, int totalKBProcess, int totalIOproc
 		pid++;
 	}
 
-	for (i = 0; i < totalPrCOProcess; i++) {
+	for (i = 0; i < totalPrCoProcess; i++) {
 		int processtype = PRODUCER;
 		if (i % 2 == 1) processtype = CONSUMER;
 		ProcessPtr prcp = ProcessConstructor(pid, processtype, 300, 100);
@@ -66,7 +66,7 @@ void initCPU (CPUPtr this, int totalProcess, int totalKBProcess, int totalIOproc
 	this->current_process = this->scheduler->getCurrrentProcess(this->scheduler);
 
 	//Construct the timer (starts the timer)
-	this->timer = SysTimerConstructor(this, this->reset);
+	this->timer = SysTimerConstructor((CPU)this, this->reset);
 }
 
 
@@ -131,7 +131,7 @@ void runCPU(CPUPtr this){ 					//main thread.//assumes that the fields are set
 
 		}
 
-		if(this->PC == getNextTrapStep(this -> current_process) {		//time to make a service call
+		if(this->PC == getNextTrapStep(this -> current_process)) {		//time to make a service call
 			printMessage(this ->current_process);
 			advanceRequest(this -> current_process);
 			interruptCPU(this, getNextTrapCode(this ->current_process), '0');
