@@ -11,11 +11,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 #include "global.h"
-//#include "TestCpu.h"				// For testing purposes.
-#ifndef SYSTEMTIMER_H
 #include "systemtimer.h"
-#endif
 
 /*
 * Basic Constructor for the system timer.

@@ -41,8 +41,6 @@ SysTimerPtr SysTimerConstructor(CPU, pthread_cond_t reset);
 */
 void SysTimerDestructor(SysTimerPtr);
 
-/******************************************************************
-
 /*******************
 ***** Functions *****
 *******************/
