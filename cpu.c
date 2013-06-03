@@ -108,7 +108,7 @@ void runCPU(CPUPtr this){ 					//main thread.//assumes that the fields are set
 				case TIMER_INT:
 					//saveState(this);
 					//switchProcess(this->scheduler, this->PC, 1);
-					pthread_cond_notify(&this->reset);
+					pthread_cond_signal(&this->reset);
 
 				break;
 				case AUDIO_SERVICE_COMPLETED: //no context switch
@@ -348,3 +348,7 @@ void printQueue(Queue the_queue){
 //
 //	return 0;
 //}
+
+int main() {
+	CPUPtr cpu = CPUConstructor(30);
+}
