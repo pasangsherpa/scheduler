@@ -32,6 +32,7 @@ void * MSget(MemSlotPtr ms) {
 }
 
 
-int main() {
-	MemSlotPtr mem = (MemSlotPtr) MemSlotConstructor();
-}
+//int main() {
+//	MemSlotPtr mem = (MemSlotPtr) MemSlotConstructor();
+//	return 0;
+//}
