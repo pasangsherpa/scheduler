@@ -11,11 +11,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include "global.h"
 #include "process.h"
 
-#ifndef GLOBAL_H
-#include "global.h"
-#endif
 
 //Constructor
 ProcessPtr ProcessConstructor(int pid, int proc_type, int no_steps, int no_requests) {
@@ -30,13 +28,27 @@ ProcessPtr ProcessConstructor(int pid, int proc_type, int no_steps, int no_reque
 	// Set up the request array with random times!
 	if (proc_type != COMPUTE) {
 		int i;
-		int r;
+		int j;						// Used for checking the uniqueness of random numbers.
+		int r;						// Random number
+		bool duplicate;
 		int step_array[no_requests];
 		int code_array[no_requests];
 		srand(time(NULL));
 
 		for (i = 0; i < no_requests; i++) {
-			r = rand() % no_steps;
+
+			do {											// Checks for uniqueness of random number.
+				duplicate = false;
+				r = rand() % no_steps;		// Generates a random number in the interval no_steps.
+
+				for (j = 0; j < i; j++) {
+					if (r == step_array[j]) {
+						duplicate = true;
+						break;
+					}
+				}
+			} while (duplicate == true);
+
 		   	step_array[i] = r;
 
 		   	switch (proc_type) {
@@ -64,13 +76,13 @@ ProcessPtr ProcessConstructor(int pid, int proc_type, int no_steps, int no_reque
 				default:
 				 	printf("\nInvalid process type!\n");
   					break;
+			}
 		}
+
 		addToRequestArray(process->requests, step_array, code_array, process->no_requests);
 	}
-
-	//construct the array
 	return process;
-};
+}
 
 
 //Destructor.
@@ -105,7 +117,7 @@ int getNextTrapCode(ProcessPtr this) {
 bool isProcessDone(ProcessPtr this, int PC) {
 	bool result = false;
 
-	if (this -> no_steps >= PC) {
+	if (this -> no_steps <= PC) {
 		result = true;
 	}
 	return result;
@@ -151,7 +163,8 @@ int printMessage(ProcessPtr this) {
 	return NO_ERROR;
 }
 
-//int main(void){
+/*
+int main(void) {
 //
 //	//test for Requests:
 //	//main creates an array of request step no's and an array of trap codes
@@ -181,26 +194,37 @@ int printMessage(ProcessPtr this) {
 //	addToRequestArray(process->requests, step_array, code_array, process->no_requests);
 //
 //	//get next step num
-//	/*
+//
 //	int i;
 //	for(i = 0; i < 10; i++){
 //
 //		printf("Next trap code: %d\n", getNextTrapCode(process));
 //		printf("Next step: %d \n", getNextTrapStep(process));
 //	}
-//	*/
 //
-//	// Test random generator.
-//	ProcessPtr process2 = ProcessConstructor(222, IO, 100, 5);
-//	int i;
-//	for(i = 0; i < 10; i++){
 //
-//			printf("Next trap code: %d\n", getNextTrapCode(process2));
-//			printf("Next step: %d \n", getNextTrapStep(process2));
-//	}
-//
-//	return 0;
-//}
+	// Test random generator.
+
+	ProcessPtr process2 = ProcessConstructor(222, IO_AUDIO, 50, 5);
+
+  	int i;
+  	for(i = 0; i < 100; i++){
+
+		printf("\nStep: %d", i);
+  		printf("\nNext Interrupt: %d \n", getNextTrapStep(process2));
+
+  		if (i == getNextTrapStep(process2)) {
+			printMessage(process2);
+			advanceRequest(process2);
+		}
+
+  		if (isProcessDone(process2, i) == true) {
+			printf("\nProcess finished!: %d\n", i);
+			break;
+		}
+  	}
+}*/
+
 
 
 

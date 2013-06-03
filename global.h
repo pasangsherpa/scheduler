@@ -35,6 +35,7 @@ typedef enum { false, true } bool;
 #define	READY				1
 #define INTERRUPTED			2
 #define BLOCKED				3
+//Process Messages
 /******* END PROCESS ********/
 
 /******TRAP AND INT(KERNEL SERVICE)VECTOR TABLE*****/
