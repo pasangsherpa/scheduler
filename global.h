@@ -17,8 +17,10 @@
 #define NO_ERROR			0
 #define ERROR				-1
 #define QUEUE_SIZE 			50
-#define QUANTA	1
 #define MAX_PROCESS			50
+#define QUANTA	1
+#define IO_QUANTA_LOWER 0.1
+#define IO_QUANTA_UPPER 0.5
 typedef enum { false, true } bool;
 /******* END GENERAL ********/
 
@@ -30,6 +32,7 @@ typedef enum { false, true } bool;
 #define CONSUMER			3
 #define IO_AUDIO				4
 #define IO_VIDEO 			5
+#define IO_DISK				6
 //Process State
 #define RUNNING 			0
 #define	READY				1
@@ -70,7 +73,6 @@ typedef enum { false, true } bool;
 #define NOT_FULL	1
 #define NOT_EMPTY	0
 /*******CONDITION VARIABLES***/
-
 
 #endif /* GLOBAL_H */
 
