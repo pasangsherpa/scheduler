@@ -103,8 +103,9 @@ int main(int argc, char * argv[]){
 		//main returns when CPU returns.(thread join)
 	
 	
-//	CPUPtr cpu = CPUConstructor(stepCount);
-
+	CPUPtr cpu = CPUConstructor();
+	initCPU(cpu, processNumber, keyboardProcess, ioProcess, pr_coProcess, computeBound, stepCount);
+	runCPU(cpu);
 
 		
 	return 0;

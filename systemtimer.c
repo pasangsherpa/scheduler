@@ -11,19 +11,18 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <pthread.h>
 #include "global.h"
-#include "cpu.h"
 //#include "TestCpu.h"				// For testing purposes.
+#ifndef SYSTEMTIMER_H
 #include "systemtimer.h"
-
+#endif
 
 /*
 * Basic Constructor for the system timer.
 * Initializes the count to the quanta set in global.h.
 * Creates a thread to run the timer.
 */
-SysTimerPtr SysTimerConstructor(CPUPtr c, pthread_cond_t condition) {
+SysTimerPtr SysTimerConstructor(CPU c, pthread_cond_t condition) {
 	SysTimerPtr timer = (SysTimerPtr) malloc(sizeof(SysTimerStr));
 	timer -> cpu = c;
 	timer -> reset = condition;

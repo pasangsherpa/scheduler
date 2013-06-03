@@ -24,7 +24,7 @@
 #include "pcb.h"
 #endif
 
-#ifndef SYSTIMER_H
+#ifndef SYSTEMTIMER_H
 #include "systemtimer.h"
 #endif
 
