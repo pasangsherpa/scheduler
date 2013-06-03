@@ -131,7 +131,12 @@ void runCPU(CPUPtr this){ 					//main thread.//assumes that the fields are set
 
 		}
 
-		if(this->PC == this->next_step) {//time to make a service call
+		if(this->PC == getNextTrapStep(this -> current_process) {		//time to make a service call
+			printMessage(this ->current_process);
+			advance_request()
+			interruptCPU(this, getNextTrapCode(this ->current_process), '0');
+
+			/*
 			this->resume = 0;
 			switch(this->next_process){
 				case VIDEO_SERVICE_REQ: //context switch
@@ -165,10 +170,15 @@ void runCPU(CPUPtr this){ 					//main thread.//assumes that the fields are set
 				break;
 				default:
 					printf("TRAP not recognized");
-			}
+			}*/
+
 		}
 
 		//run current process here???
+
+		if (isProcessDone(this ->current_process, this -> PC)) {
+					this -> PC = 0;
+		}
 	}
 	//kill cpu
 }
