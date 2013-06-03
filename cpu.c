@@ -32,7 +32,6 @@ CPUPtr CPUConstructor() {
 void initCPU (CPUPtr this, int totalProcess, int totalKBProcess, int totalIOprocess,
 		int totalPrCoProcess, int totalComputeProcess, int the_max_step_count) {
 	this->reset = PTHREAD_COND_INITIALIZER;
-	this->timer = SysTimerConstructor(this, this->reset);
 	this->scheduler = SchedulerConstructor(totalProcess);//process scheduler
 	this->max_step_count = the_max_step_count;		//max steps this CPU will run
 
@@ -95,10 +94,10 @@ void interruptCPU(CPUPtr this, int the_IRQ, char the_data){
 CPU thread runs as long as there are more steps to run.
 */
 void runCPU(CPUPtr this){ 					//main thread.//assumes that the fields are set
-	SysTimerRun(this->timer);
+	this->timer = SysTimerConstructor(this, this->reset);
 	while(this->max_step_count > 0 && this->resume ==1){	
 		this->max_step_count--;//decrement the max step
-		this->PC--;
+		this->PC = this->current_process->pcb->next_step;
 		printf("Current count = %d\n",this->max_step_count);
 		if(this->INT ==1){	
 			

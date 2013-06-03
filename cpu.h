@@ -41,7 +41,7 @@ typedef struct cpu {
 		int IRQ;
 		int resume;		
 		SysTimerPtr timer;
-		pthread_mutex_t reset;
+		pthread_cond_t reset;
         
 } CPUStr, *CPUPtr;
 
