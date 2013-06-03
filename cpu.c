@@ -16,14 +16,14 @@
 
 CPUPtr CPUConstructor() {
 		CPUPtr result = (CPUPtr) malloc(sizeof(CPUStr));
-		result->PC = 0;										//current process' PC										
+		result->PC = 0;										//current process' PC
 		result->next_process = 0;							//next service call address in the trap vector
-		result->next_step=0;								//next PC when currently running process will be preemted.		
+		result->next_step=0;								//next PC when currently running process will be preemted.
 		result->current_process = NULL;						//currently running process
 		result->INT =0;										//whether this cpu is interrupted.
-		result->IRQ = 0;									//IRQ code of the interrupting device	
+		result->IRQ = 0;									//IRQ code of the interrupting device
 		result->resume = 0;									//may not be necessary
-		result->buffer_data = '0';							//buffer	
+		result->buffer_data = '0';							//buffer
 		result->process_pid = 0;							//current process pid
 		return result;
 }
@@ -64,6 +64,9 @@ void initCPU (CPUPtr this, int totalProcess, int totalKBProcess, int totalIOproc
 	this->scheduler->setCurrentProcess(this->scheduler);
 	//set the currect process in cpu.
 	this->current_process = this->scheduler->getCurrrentProcess(this->scheduler);
+
+	//Construct the timer (starts the timer)
+	this->timer = SysTimerConstructor(this, this->reset);
 }
 
 
@@ -72,12 +75,12 @@ void initCPU (CPUPtr this, int totalProcess, int totalKBProcess, int totalIOproc
 /*
 Context switch: CPU's context is switched to the next process selected by the process scheduler.
 */
-void setNextProcess(CPUPtr this){ 
-	this->current_process = getCurrentProcess(this->scheduler); 
+void setNextProcess(CPUPtr this){
+	this->current_process = getCurrentProcess(this->scheduler);
 	this->PC = this->current_process->no_steps;
-	this->next_step = getNextTrapStep(this->current_process);	
+	this->next_step = getNextTrapStep(this->current_process);
 	this->next_process = getNextTrapCode(this->current_process);
-	this->process_pid = this->current_process->pcb->pid;	
+	this->process_pid = this->current_process->pcb->pid;
 	this->resume = 1;
 }
 
@@ -94,50 +97,51 @@ void interruptCPU(CPUPtr this, int the_IRQ, char the_data){
 CPU thread runs as long as there are more steps to run.
 */
 void runCPU(CPUPtr this){ 					//main thread.//assumes that the fields are set
-	this->timer = SysTimerConstructor(this, this->reset);
-	while(this->max_step_count > 0 && this->resume ==1){	
+
+	while(this->max_step_count > 0 && this->resume ==1){
 		this->max_step_count--;//decrement the max step
 		this->PC = this->current_process->pcb->next_step;
 		printf("Current count = %d\n",this->max_step_count);
-		if(this->INT ==1){	
-			
+		if(this->INT ==1){
+
 			switch(this->IRQ){
-				case TIMER_INT:						 			
-					//saveState(this);					
-					//switchProcess(this->scheduler, this->PC, 1); 			
-				
+				case TIMER_INT:
+					//saveState(this);
+					//switchProcess(this->scheduler, this->PC, 1);
+					pthread_cond_notify(&this -> reset);
+
 				break;
-				case AUDIO_SERVICE_COMPLETED: //no context switch					
-					//saveState(this);					
+				case AUDIO_SERVICE_COMPLETED: //no context switch
+					//saveState(this);
 					//switchProcess(this->scheduler, this->PC, 7);//QUEUE IS OK
-					
+
 				break;
-				case VIDEO_SERVICE_COMPLETED://no context switch	
-					//saveState(this);					
-					//switchProcess(this->scheduler, this->PC, 3);					
-					
+				case VIDEO_SERVICE_COMPLETED://no context switch
+					//saveState(this);
+					//switchProcess(this->scheduler, this->PC, 3);
+
 				break;
-				case KEYBOARD_COMPLETED://no context switch	
+				case KEYBOARD_COMPLETED://no context switch
 					saveState(this);
-					keyboardServiceCompleted(this);					
+					keyboardServiceCompleted(this);
 				break;
 				default:
 					printf("INT not recognized");
 			}
-				
+
 		}
-		
+
 		if(this->PC == this->next_step) {//time to make a service call
 			this->resume = 0;
-			switch(this->next_process){			
-				case VIDEO_SERVICE_REQ: //context switch	
+			switch(this->next_process){
+				case VIDEO_SERVICE_REQ: //context switch
 				//saveState(this); //create video service thread
-				//switchProcess(this->scheduler, this->PC, 2);					
+				//switchProcess(this->scheduler, this->PC, 2);
 				break;
 				case KEYBOARD_SERVICE_REQ://special case //context switch
 				saveState(this);
 				printf("Saved state \n");
-				keyboardServiceRequest(this);						
+				keyboardServiceRequest(this);
 				break;
 				case AUDIO_SERVICE_REQ: //context switch //create audio service thread
 				//saveState(this);
@@ -169,22 +173,22 @@ void runCPU(CPUPtr this){ 					//main thread.//assumes that the fields are set
 	//kill cpu
 }
 
-	
+
 void saveState(CPUPtr this){
 	  this->current_process->no_steps = this->PC;
 }
 
-void keyboardServiceRequest(CPUPtr this){ //a key press should trigger this method.		
+void keyboardServiceRequest(CPUPtr this){ //a key press should trigger this method.
 		printf("------------------I/O REQUEST---------------------\n");
 		printf("Process PID = %d requested a keyboard service.\n",this->process_pid);
-		printf("Process PID = %d's PC = %d has been saved to its PCB\n",this->process_pid,this->PC);		
+		printf("Process PID = %d's PC = %d has been saved to its PCB\n",this->process_pid,this->PC);
 		switchProcess(this->scheduler, &this->PC, 4, NULL);
 		setNextProcess(this);
-		printf("Process PID = %d - running\n", this->process_pid);	
+		printf("Process PID = %d - running\n", this->process_pid);
 		printf("------------------I/O REQUEST---------------------\n");
 		printf("Enter char: \n");
-		getKey(this);			
-		
+		getKey(this);
+
 }
 
 void keyboardServiceCompleted(CPUPtr this){
@@ -194,18 +198,18 @@ void keyboardServiceCompleted(CPUPtr this){
 	switchProcess(this->scheduler, &this->PC, 5, NULL);
 	printf("Key pressed =  %c\n",this->buffer_data);
 	printf("P%d- running\n",this->process_pid);
-	printf("------------------I/O INT---------------------\n");	
+	printf("------------------I/O INT---------------------\n");
 }
 
 /*
 The Keyboard Device.
 */
-void getKey(CPUPtr this){ 
+void getKey(CPUPtr this){
 		char stdin_char = getchar();
 		getchar();
 		interruptCPU(this, 1, stdin_char);
 }
-																
+
 
 
 /*
@@ -235,7 +239,7 @@ void printState(CPUPtr this){
 	printf("waiting\n");
 	printf("----------------------------------------------------\n");
 }
-	
+
 
 //Destructor.
 int CPUDestructor(CPUPtr this) {
@@ -247,17 +251,17 @@ int CPUDestructor(CPUPtr this) {
 Prints out the PID of the processes in the given queue
 */
 void printQueue(Queue the_queue){
-	
+
 	if(IsEmpty(the_queue) == 0){
-	
+
 		ElementType * temp = getQueue(the_queue);
-		int list_size = Size(the_queue);			
+		int list_size = Size(the_queue);
 			ProcessPtr p ;
 			int index = 0;
 			for(index = 0; index < list_size; index++){
-				p = temp[index];				
+				p = temp[index];
 				printf("PID = %i  ",p->pcb->pid);
-			}		
+			}
 	}
 }
 
