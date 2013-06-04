@@ -28,16 +28,18 @@ ProcessPtr ProcessConstructor(int pid, int proc_type, int no_steps,
 			decodeProcessType(process->proc_type));
 
 	// Set up the request array with random times!
-	if (proc_type != COMPUTE) {
-		int i;
-		int j; // Used for checking the uniqueness of random numbers.
-		int r; // Random number
-		bool duplicate;
-		int step_array[no_requests];
-		int code_array[no_requests];
-		srand(time(NULL));
-		for (i = 0; i < no_requests; i++) {
+	int i;
+	int j; // Used for checking the uniqueness of random numbers.
+	int r; // Random number
+	bool duplicate;
+	int step_array[no_requests];
+	int code_array[no_requests];
+	srand(time(NULL));
+	for (i = 0; i < no_requests; i++) {
 
+		if (proc_type == COMPUTE) {
+			r  = -1;
+		} else {
 			do { // Checks for uniqueness of random number.
 				duplicate = false;
 				r = rand() % no_steps; // Generates a random number in the interval no_steps.
@@ -49,10 +51,15 @@ ProcessPtr ProcessConstructor(int pid, int proc_type, int no_steps,
 					}
 				}
 			} while (duplicate == true);
+		}
 
-			step_array[i] = r;
+		step_array[i] = r;
 
-			switch (proc_type) {
+		switch (proc_type) {
+
+			case COMPUTE:
+				code_array[i] = -1;
+				break;
 
 			case IO_AUDIO:
 				code_array[i] = AUDIO_SERVICE_REQ;
@@ -82,7 +89,7 @@ ProcessPtr ProcessConstructor(int pid, int proc_type, int no_steps,
 
 		addToRequestArray(process->requests, step_array, code_array,
 				process->no_requests);
-	}
+
 	return process;
 }
 
