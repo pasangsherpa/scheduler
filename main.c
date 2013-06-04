@@ -88,15 +88,17 @@ int main(int argc, char * argv[]){
 	}
 		
 	//Inputs are correct, print the initial info text to stdout:
+	printf("------------------------------------\n");
 	printf("Initial View\n");
-	printf("-------------\n");
+	printf("-------------------------------\n");
 	printf("Total number of processes: %d \n", processNumber);
 	printf("Keyboard: %d\n",keyboardProcess);
 	printf("I/O: %d\n",ioProcess);
 	printf("Producer-Consumer Pair: %d\n",pr_coProcess);
 	printf("Compute bound: %d\n",computeBound);	
 	printf("Step Count: %d\n",stepCount);
-	
+	printf("------------------------------------\n");
+
 	//start	
 		//main creates the CPU thread
 		//CPU cleans up/returns when done
