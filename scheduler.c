@@ -40,6 +40,16 @@ int SchedulerDestructor(SchedulerPtr this) {
 	return NO_ERROR;
 }
 
+void printQueueElement(Queue queue) {
+		int i;
+		ProcessPtr* q = (ProcessPtr*) getQueue(queue);
+		i = 0;
+		while (i < Size(queue)) {
+			printf("%d\n", q[i]->pcb->pid);
+			i++;
+	}
+
+ }
 /**
  * Set current running process.
  */
@@ -87,20 +97,20 @@ ProcessPtr switchProcess(SchedulerPtr this, int *PC, int interrupt, ProcessPtr p
 		}
 		break;
 	case MUTEX_LOCK:  //if a process upcalls the scheduler for mutex lock, we know that it is blocked.
-	
-			this->current_process->pcb->state = BLOCKED;		
-			FrontAndDequeue(this->ready_queue);//the process needs to be removed from the ready queue.	
+
+			this->current_process->pcb->state = BLOCKED;
+			FrontAndDequeue(this->ready_queue);//the process needs to be removed from the ready queue.
 			this->setCurrentProcess(this);
-		
+
 		break;
 	case MUTEX_UNLOCK:
 			prcss->pcb->state = READY;
 			this->addToQueue(this,prcss,this->ready_queue);
 		break;
-		
+
 	case COND_WAIT:
 		break;
-		
+
 	case COND_SIGNAL:
 		break;
 	default:

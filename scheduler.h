@@ -42,6 +42,6 @@ int setCurrentProcess(SchedulerPtr this);
 ProcessPtr switchProcess(SchedulerPtr this, int *pc, int interrupt, ProcessPtr process);
 int addToQueue(SchedulerPtr this, ProcessPtr process, Queue Q);
 ProcessPtr getCurrentProcess(SchedulerPtr this);
-
+void printQueueElement(Queue queue);
 
 #endif /* SCHEDULER_H */

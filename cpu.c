@@ -14,6 +14,7 @@
 #include "global.h"
 #endif
 
+
 CPUPtr CPUConstructor() {
 	CPUPtr result = (CPUPtr) malloc(sizeof(CPUStr));
 	result->PC = 0; //current process' PC
@@ -38,32 +39,16 @@ void initCPU(CPUPtr this, int totalProcess, int totalKBProcess,
 	//Setup all processes
 	int i;
 	int pid = 0;
-	for (i = 0; i < totalKBProcess; i++) {
-		ProcessPtr kbp = ProcessConstructor(pid, KEYBOARD, 300, 100); // 300 & 100 dummy values
-		this->scheduler->addToQueue(this->scheduler, kbp,
-				this->scheduler->ready_queue);
-		pid++;
-	}
 
-	for (i = 0; i < totalIOProcess; i++) {
-		int processtype = IO_AUDIO;
-		if (i % 2 == 1)
-			processtype = IO_VIDEO; // Create IO_VIDEO every other number.
-		ProcessPtr iop = ProcessConstructor(pid, processtype, 300, 100);
-		this->scheduler->addToQueue(this->scheduler, iop,
-				this->scheduler->ready_queue);
-		pid++;
-	}
-
-	for (i = 0; i < totalPrCoProcess; i++) {
-		int processtype = PRODUCER;
-		if (i % 2 == 1)
-			processtype = CONSUMER;
-		ProcessPtr prcp = ProcessConstructor(pid, processtype, 300, 100);
-		this->scheduler->addToQueue(this->scheduler, prcp,
-				this->scheduler->ready_queue);
-		pid++;
-	}
+		for (i = 0; i < totalIOProcess; i++) {
+			int processtype = IO_AUDIO;
+			if (i % 2 == 1)
+				processtype = IO_VIDEO; // Create IO_VIDEO every other number.
+			ProcessPtr iop = ProcessConstructor(pid, processtype, 300, 100);
+			this->scheduler->addToQueue(this->scheduler, iop,
+					this->scheduler->ready_queue);
+			pid++;
+		}
 
 	for (i = 0; i < totalComputeProcess; i++) {
 		ProcessPtr cm = ProcessConstructor(pid, COMPUTE, 300, 100);
@@ -71,12 +56,33 @@ void initCPU(CPUPtr this, int totalProcess, int totalKBProcess,
 				this->scheduler->ready_queue);
 		pid++;
 	}
+
+	for (i = 0; i < totalKBProcess; i++) {
+			ProcessPtr kbp = ProcessConstructor(pid, KEYBOARD, 300, 100); // 300 & 100 dummy values
+			this->scheduler->addToQueue(this->scheduler, kbp,
+					this->scheduler->ready_queue);
+			pid++;
+		}
+
+		for (i = 0; i < totalPrCoProcess; i++) {
+			int processtype = PRODUCER;
+			if (i % 2 == 1)
+				processtype = CONSUMER;
+			ProcessPtr prcp = ProcessConstructor(pid, processtype, 300, 100);
+			this->scheduler->addToQueue(this->scheduler, prcp,
+					this->scheduler->ready_queue);
+			pid++;
+	}
+
 	printf("------------------------------------\n");
 	//Load first process in the scheduler.
 	this->scheduler->setCurrentProcess(this->scheduler);
 	//set the currect process in cpu.
 	this->current_process
 			= this->scheduler->getCurrrentProcess(this->scheduler);
+
+	ProcessPtr p = this->scheduler->getCurrrentProcess(this->scheduler);
+	printf("Current: %d\n", p->pcb->pid);
 
 	//Construct the timer (starts the timer)
 	this->timer = SysTimerConstructor((CPU) this, this->reset);
@@ -110,7 +116,9 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 		this->max_step_count--;//decrement the max step
 		this->PC = this->current_process->pcb->next_step;
 		printf("Current count = %d\n", this->max_step_count);
+
 		if (this->INT == 1) {
+			printf("\nINT: %d\n", this -> IRQ);
 
 			switch (this->IRQ) {
 			case TIMER_INT:
@@ -138,9 +146,11 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 				printf("INT not recognized\n");
 			}
 
+			this -> INT = 0;
 		}
 
 		if (this->PC == getNextTrapStep(this -> current_process)) { //time to make a service call
+			printf("Service Call made...\n");
 			printMessage(this ->current_process);
 			advanceRequest(this -> current_process);
 			interruptCPU(this, getNextTrapCode(this ->current_process), '0');
@@ -184,6 +194,7 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 		}
 
 		if (isProcessDone(this ->current_process, this -> PC)) {
+			printf("Process Completed..\n");
 			this -> PC = 0;
 		}
 	}
@@ -356,8 +367,8 @@ void printQueue(Queue the_queue) {
 //
 //	return 0;
 //}
-
+/*
 int main() {
 	CPUPtr cpu = CPUConstructor(30);
 
-}
+}*/
