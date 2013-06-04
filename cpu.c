@@ -357,6 +357,7 @@ void printQueue(Queue the_queue) {
 //	return 0;
 //}
 
-//int main() {
-//	CPUPtr cpu = CPUConstructor(30);
-//}
+int main() {
+	CPUPtr cpu = CPUConstructor(30);
+
+}
