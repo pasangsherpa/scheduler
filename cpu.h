@@ -30,10 +30,8 @@
 
 typedef struct cpu {
         int PC; 				//Program counter
-		int max_step_count; 	//Number of steps this CPU will run.        
+		int max_step_count; 	//Number of steps this CPU will run.
         SchedulerPtr scheduler;
-		int next_process;		//the code of the system service this cpu will call
-		int next_step;		//when the cpu will call the service 
 		int process_pid;
 		char buffer_data;
 		ProcessPtr current_process;	//currently running process pcb
@@ -41,7 +39,7 @@ typedef struct cpu {
 		int IRQ;
 		SysTimerPtr timer;
 		pthread_cond_t reset;
-        
+
 } CPUStr, *CPUPtr;
 
 // Constructor
@@ -67,7 +65,7 @@ void printState(CPUPtr this);
 void printQueue(Queue the_queue);
 
 
-//int mutex_lock_trap_handler(CPUPtr this,MutexPtr mutex); 
+//int mutex_lock_trap_handler(CPUPtr this,MutexPtr mutex);
 //int mutex_unlock_trap_handler(CPUPtr this, ProcessPtr process); //assumption: we know which process
                                                                                                                                 //is waiting on which lock+ a process can only be in one queue.
 //int cond_wait_trap_handler(CPUPtr this);//task:Condition pointer

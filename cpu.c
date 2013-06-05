@@ -18,8 +18,6 @@
 CPUPtr CPUConstructor() {
 	CPUPtr result = (CPUPtr) malloc(sizeof(CPUStr));
 	result->PC = -1; 		// Initial PC (will be incremented to 0).
-	result->next_process = 0; //next service call address in the trap vector
-	result->next_step = 0; //next PC when currently running process will be preemted.
 	result->current_process = NULL; //currently running process
 	result->INT = 0; //whether this cpu is interrupted.
 	result->IRQ = 0; //IRQ code of the interrupting device
@@ -92,9 +90,7 @@ void initCPU(CPUPtr this, int totalProcess, int totalKBProcess,
  */
 void setNextProcess(CPUPtr this) {
 	this->current_process = getCurrentProcess(this->scheduler);
-	this->PC = this->current_process->no_steps;
-	this->next_step = getNextTrapStep(this->current_process);
-	this->next_process = getNextTrapCode(this->current_process);
+	this->PC = this->current_process->pcb->next_step;
 	this->process_pid = this->current_process->pcb->pid;
 }
 
@@ -223,7 +219,8 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 }
 
 void saveState(CPUPtr this) {
-	this->current_process->no_steps = this->PC;
+	// PC gets reincremented at top of CPU Run loop.
+	this->current_process->pcb->next_step = (this->PC - 1);
 }
 
 void keyboardServiceRequest(CPUPtr this) { //a key press should trigger this method.
