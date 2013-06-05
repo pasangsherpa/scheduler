@@ -20,7 +20,7 @@ PCBPtr PCBConstructor(int pid){
 	PCBPtr pcb = (PCBPtr)malloc(sizeof(PCBStr));
 	pcb->pid = pid;
 	pcb->state = READY;
-	pcb->next_step = 0;
+	pcb->next_step = -1;
 	pcb->waiting_on = 0;
 	pcb->owns = 0;
 
