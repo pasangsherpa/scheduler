@@ -71,31 +71,35 @@ ProcessPtr switchProcess(SchedulerPtr this, int *PC, int interrupt, ProcessPtr p
 	ProcessPtr process = NULL;
 
 	switch (interrupt) {
-	case TIMER_INT:
-		this->addToQueue(this, this->current_process, this->ready_queue);
-		this->current_process->pcb->state = READY;
-		this->current_process->no_steps = *PC; //Store the current PC
-		this->setCurrentProcess(this);
-		*PC = this->current_process->no_steps; //Start where it was left at
-		break;
-	case VIDEO_SERVICE_REQ:
-	case AUDIO_SERVICE_REQ:
-	case KEYBOARD_SERVICE_REQ:
-		this->addToQueue(this, this->current_process, this->io_queue);
-		this->current_process->pcb->state = BLOCKED; //waiting on io
-		this->current_process->no_steps = *PC - 1; //Store the current PC
-		this->setCurrentProcess(this);
-		*PC = this->current_process->no_steps; //Start where it was left at
-		break;
-	case VIDEO_SERVICE_COMPLETED:
-	case AUDIO_SERVICE_COMPLETED:
-	case KEYBOARD_SERVICE_COMPLETED:
-		if (!IsEmpty(this->io_queue)) {
-			process = FrontAndDequeue(this->io_queue);
-			process->pcb->state = READY;
-			this->addToQueue(this, process, this->ready_queue);
-		}
-		break;
+
+		case TIMER_INT:
+			this->addToQueue(this, this->current_process, this->ready_queue);
+			this->current_process->pcb->state = READY;
+			this->current_process->pcb->next_step = *PC; //Store the current PC
+			this->setCurrentProcess(this);
+			*PC = this->current_process->pcb->next_step; //Start where it was left at
+			break;
+
+		case VIDEO_SERVICE_REQ:
+		case AUDIO_SERVICE_REQ:
+		case KEYBOARD_SERVICE_REQ:
+			this->addToQueue(this, this->current_process, this->io_queue);
+			this->current_process->pcb->state = BLOCKED; //waiting on io
+			this->current_process->pcb->next_step = *PC - 1; //Store the current PC
+			this->setCurrentProcess(this);
+			*PC = this->current_process->pcb->next_step; //Start where it was left at
+			break;
+
+		case VIDEO_SERVICE_COMPLETED:
+		case AUDIO_SERVICE_COMPLETED:
+		case KEYBOARD_SERVICE_COMPLETED:
+			if (!IsEmpty(this->io_queue)) {
+				process = FrontAndDequeue(this->io_queue);
+				process->pcb->state = READY;
+				this->addToQueue(this, process, this->ready_queue);
+			}
+			break;
+
 	case MUTEX_LOCK:  //if a process upcalls the scheduler for mutex lock, we know that it is blocked.
 
 			this->current_process->pcb->state = BLOCKED;

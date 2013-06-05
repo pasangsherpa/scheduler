@@ -90,7 +90,6 @@ void initCPU(CPUPtr this, int totalProcess, int totalKBProcess,
  */
 void setNextProcess(CPUPtr this) {
 	this->current_process = getCurrentProcess(this->scheduler);
-	this->PC = this->current_process->pcb->next_step;
 	this->process_pid = this->current_process->pcb->pid;
 }
 
@@ -157,7 +156,6 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 					printf("In Audio Service Request\n");
 					switchProcess(this->scheduler, &this->PC,
 												AUDIO_SERVICE_REQ, NULL);
-					printf("pid after context switch: %d\n", this -> process_pid);
 					break;
 
 				case AUDIO_SERVICE_COMPLETED: 		//no context switch
@@ -192,6 +190,9 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 					break;
 			}
 
+			setNextProcess(this);
+			printf("pid after context switch: %d\n", this -> process_pid);
+
 			// Fix! Need to check if there are others waiting!
 			this -> INT = 0;
 		}
@@ -202,7 +203,7 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 		* interrupts the CPU.
 		*/
 		else if (this->PC == getNextTrapStep(this -> current_process)) {
-			printf("About to make a service call...\n");
+			printf("\nAbout to make a service call...\n");
 			printMessage(this ->current_process);
 			advanceRequest(this -> current_process);
 			interruptCPU(this, getNextTrapCode(this ->current_process), '0');
