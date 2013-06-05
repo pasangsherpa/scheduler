@@ -119,7 +119,11 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 		printf("Current count = %d\n", this->max_step_count);
 		printf("PC Value: %d\n", this->PC);
 
-		if (this->INT == 1) {					// An interrupt has occured.
+		/*
+		* Checks to see whether an interrupt has occured.
+		* If so, it figures out what generated it and takes appropriate action.
+		*/
+		if (this->INT == 1) {
 
 			switch (this->IRQ) {			// Figure out what interrupt has occured.
 
@@ -189,50 +193,23 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 			this -> INT = 0;
 		}
 
-		if (this->PC == getNextTrapStep(this -> current_process)) { //time to make a service call
+		/*
+		* Checks to see if the current process is going to make a service call.
+		* If so, it prints its message, advances its request queue, and
+		* interrupts the CPU.
+		*/
+		if (this->PC == getNextTrapStep(this -> current_process)) {
 			printf("About to make a service call...\n");
 			printMessage(this ->current_process);
 			advanceRequest(this -> current_process);
 			interruptCPU(this, getNextTrapCode(this ->current_process), '0');
-
-			/*
-			 this->resume = 0;
-			 switch(this->next_process){
-			 case VIDEO_SERVICE_REQ: //context switch
-			 //saveState(this); //create video service thread
-			 //switchProcess(this->scheduler, this->PC, 2);
-			 break;
-			 case KEYBOARD_SERVICE_REQ://special case //context switch
-			 saveState(this);
-			 printf("Saved state \n");
-			 keyboardServiceRequest(this);
-			 break;
-			 case AUDIO_SERVICE_REQ: //context switch //create audio service thread
-			 //saveState(this);
-			 //switchProcess(this->scheduler, this->PC, 6);
-			 break;
-			 case MUTEX_LOCK:
-			 //saveState(this);
-			 //switchProcess(this->scheduler, this->PC, 8);
-			 break;
-			 case MUTEX_UNLOCK:
-			 //saveState(this);
-			 //switchProcess(this->scheduler, this->PC, 9);
-			 break;
-			 case COND_WAIT: //context switch
-			 //saveState(this);
-			 //switchProcess(this->scheduler, this->PC, 10);
-			 break;
-			 case COND_SIGNAL:
-			 //saveState(this);
-			 //switchProcess(this->scheduler, this->PC, 11);
-			 break;
-			 default:
-			 printf("TRAP not recognized");
-			 }*/
-
 		}
 
+		/*
+		* Checks to see whether a process has completed its total number
+		* of steps. If so, it prints that its completed and resets the PC
+		* to the beginning of the program
+		*/
 		if (isProcessDone(this ->current_process, this -> PC)) {
 			printf("Process Completed..\n");
 			this -> PC = -1;					// Will be incremented to 0 at top of loop.
