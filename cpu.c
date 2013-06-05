@@ -17,7 +17,7 @@
 
 CPUPtr CPUConstructor() {
 	CPUPtr result = (CPUPtr) malloc(sizeof(CPUStr));
-	result->PC = 0; //current process' PC
+	result->PC = -1; 		// Initial PC (will be incremented to 0).
 	result->next_process = 0; //next service call address in the trap vector
 	result->next_step = 0; //next PC when currently running process will be preemted.
 	result->current_process = NULL; //currently running process
@@ -44,7 +44,7 @@ void initCPU(CPUPtr this, int totalProcess, int totalKBProcess,
 			int processtype = IO_AUDIO;
 			if (i % 2 == 1)
 				processtype = IO_VIDEO; // Create IO_VIDEO every other number.
-			ProcessPtr iop = ProcessConstructor(pid, processtype, 6, 5);
+			ProcessPtr iop = ProcessConstructor(pid, processtype, 6, 2);
 			this->scheduler->addToQueue(this->scheduler, iop,
 					this->scheduler->ready_queue);
 			pid++;
@@ -114,12 +114,12 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 
 	while (this->max_step_count > 0) {
 
-		this->PC = this->current_process->pcb->next_step;
+		this->PC++;					// Increment the PC.
+
 		printf("Current count = %d\n", this->max_step_count);
+		printf("PC Value: %d\n", this->PC);
 
 		if (this->INT == 1) {					// An interrupt has occured.
-
-			printf("\nINT: %d\n", this -> IRQ);
 
 			switch (this->IRQ) {			// Figure out what interrupt has occured.
 
@@ -235,7 +235,7 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 
 		if (isProcessDone(this ->current_process, this -> PC)) {
 			printf("Process Completed..\n");
-			this -> PC = 0;
+			this -> PC = -1;					// Will be incremented to 0 at top of loop.
 		}
 
 		this->max_step_count--;			//decrement the max step.
