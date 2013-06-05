@@ -14,10 +14,9 @@
 #include "global.h"
 #endif
 
-
 CPUPtr CPUConstructor() {
 	CPUPtr result = (CPUPtr) malloc(sizeof(CPUStr));
-	result->PC = -1; 		// Initial PC (will be incremented to 0).
+	result->PC = -1; // Initial PC (will be incremented to 0).
 	result->current_process = NULL; //currently running process
 	result->INT = 0; //whether this cpu is interrupted.
 	result->IRQ = 0; //IRQ code of the interrupting device
@@ -38,15 +37,15 @@ void initCPU(CPUPtr this, int totalProcess, int totalKBProcess,
 	int i;
 	int pid = 0;
 
-		for (i = 0; i < totalIOProcess; i++) {
-			int processtype = IO_AUDIO;
-			if (i % 2 == 1)
-				processtype = IO_VIDEO; // Create IO_VIDEO every other number.
-			ProcessPtr iop = ProcessConstructor(pid, processtype, 6, 2);
-			this->scheduler->addToQueue(this->scheduler, iop,
-					this->scheduler->ready_queue);
-			pid++;
-		}
+	for (i = 0; i < totalIOProcess; i++) {
+		int processtype = IO_AUDIO;
+		if (i % 2 == 1)
+			processtype = IO_VIDEO; // Create IO_VIDEO every other number.
+		ProcessPtr iop = ProcessConstructor(pid, processtype, 6, 2);
+		this->scheduler->addToQueue(this->scheduler, iop,
+				this->scheduler->ready_queue);
+		pid++;
+	}
 
 	for (i = 0; i < totalComputeProcess; i++) {
 		ProcessPtr cm = ProcessConstructor(pid, COMPUTE, 300, 100);
@@ -56,20 +55,20 @@ void initCPU(CPUPtr this, int totalProcess, int totalKBProcess,
 	}
 
 	for (i = 0; i < totalKBProcess; i++) {
-			ProcessPtr kbp = ProcessConstructor(pid, KEYBOARD, 300, 100); // 300 & 100 dummy values
-			this->scheduler->addToQueue(this->scheduler, kbp,
-					this->scheduler->ready_queue);
-			pid++;
-		}
+		ProcessPtr kbp = ProcessConstructor(pid, KEYBOARD, 300, 100); // 300 & 100 dummy values
+		this->scheduler->addToQueue(this->scheduler, kbp,
+				this->scheduler->ready_queue);
+		pid++;
+	}
 
-		for (i = 0; i < totalPrCoProcess; i++) {
-			int processtype = PRODUCER;
-			if (i % 2 == 1)
-				processtype = CONSUMER;
-			ProcessPtr prcp = ProcessConstructor(pid, processtype, 300, 100);
-			this->scheduler->addToQueue(this->scheduler, prcp,
-					this->scheduler->ready_queue);
-			pid++;
+	for (i = 0; i < totalPrCoProcess; i++) {
+		int processtype = PRODUCER;
+		if (i % 2 == 1)
+			processtype = CONSUMER;
+		ProcessPtr prcp = ProcessConstructor(pid, processtype, 300, 100);
+		this->scheduler->addToQueue(this->scheduler, prcp,
+				this->scheduler->ready_queue);
+		pid++;
 	}
 
 	printf("------------------------------------\n");
@@ -106,85 +105,85 @@ void interruptCPU(CPUPtr this, int the_IRQ, char the_data) {
 void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 	while (this->max_step_count > 0) {
 
-		this->PC++;					// Increment the PC.
-
+		this->PC++; // Increment the PC.
 		printf("Current count = %d\n", this->max_step_count);
 		printf("PC Value: %d\n", this->PC);
+		printf("Process %d (Type: %s) is running... \n", this->current_process->pcb->pid,
+				decodeProcessType(this->current_process->proc_type));
 
 		/*
-		* Checks to see whether an interrupt has occured.
-		* If so, it figures out what generated it and takes appropriate action.
-		*/
+		 * Checks to see whether an interrupt has occured.
+		 * If so, it figures out what generated it and takes appropriate action.
+		 */
 		if (this->INT == 1) {
 
-			switch (this->IRQ) {			// Figure out which interrupt has occured.
+			switch (this->IRQ) { // Figure out which interrupt has occured.
 
-				case TIMER_INT:
-					printf("Timer interrupt/n");
-					switchProcess(this->scheduler, &this->PC, TIMER_INT, NULL);
+			case TIMER_INT:
+				printf("Timer interrupt/n");
+				switchProcess(this->scheduler, &this->PC, TIMER_INT, NULL);
 
-					//  Signal to restart the timer.
-					pthread_cond_signal(&this->reset);
-					break;
+				//  Signal to restart the timer.
+				pthread_cond_signal(&this->reset);
+				break;
 
-				case VIDEO_SERVICE_REQ:
-					switchProcess(this->scheduler, &this->PC,
-												VIDEO_SERVICE_REQ, NULL);
-					break;
+			case VIDEO_SERVICE_REQ:
+				switchProcess(this->scheduler, &this->PC, VIDEO_SERVICE_REQ,
+						NULL);
+				break;
 
-				case VIDEO_SERVICE_COMPLETED:			//no context switch
-					printf("IO: (Video Service Completed)\n");
-					switchProcess(this->scheduler, &this->PC,
-												VIDEO_SERVICE_COMPLETED, NULL);
-					break;
+			case VIDEO_SERVICE_COMPLETED: //no context switch
+				printf("IO: (Video Service Completed)\n");
+				switchProcess(this->scheduler, &this->PC,
+						VIDEO_SERVICE_COMPLETED, NULL);
+				break;
 
-				case KEYBOARD_SERVICE_REQ:
-					switchProcess(this->scheduler, &this->PC,
-												KEYBOARD_SERVICE_REQ, NULL);
-					break;
+			case KEYBOARD_SERVICE_REQ:
+				switchProcess(this->scheduler, &this->PC, KEYBOARD_SERVICE_REQ,
+						NULL);
+				break;
 
-				case KEYBOARD_SERVICE_COMPLETED:
-					printf("IO: (Keyboard Service Completed)\n");
-					switchProcess(this->scheduler, &this->PC,
-												KEYBOARD_SERVICE_COMPLETED, NULL);
-					break;
+			case KEYBOARD_SERVICE_COMPLETED:
+				printf("IO: (Keyboard Service Completed)\n");
+				switchProcess(this->scheduler, &this->PC,
+						KEYBOARD_SERVICE_COMPLETED, NULL);
+				break;
 
-				case AUDIO_SERVICE_REQ:
-					printf("In Audio Service Request\n");
-					switchProcess(this->scheduler, &this->PC,
-												AUDIO_SERVICE_REQ, NULL);
-					break;
+			case AUDIO_SERVICE_REQ:
+				printf("In Audio Service Request\n");
+				switchProcess(this->scheduler, &this->PC, AUDIO_SERVICE_REQ,
+						NULL);
+				break;
 
-				case AUDIO_SERVICE_COMPLETED: 		//no context switch
-					printf("IO: (Audio Service Completed)\n");
-					switchProcess(this->scheduler, &this->PC,
-												AUDIO_SERVICE_COMPLETED, NULL);
-					break;
+			case AUDIO_SERVICE_COMPLETED: //no context switch
+				printf("IO: (Audio Service Completed)\n");
+				switchProcess(this->scheduler, &this->PC,
+						AUDIO_SERVICE_COMPLETED, NULL);
+				break;
 
-				case MUTEX_LOCK:
-					printf("Mutex Lock Requested\n");
-					// ADD additional
-					break;
+			case MUTEX_LOCK:
+				printf("Mutex Lock Requested\n");
+				// ADD additional
+				break;
 
-				case MUTEX_UNLOCK:
-					printf("Mutex Unlock Requested\n");
-					// ADD additional
-					break;
+			case MUTEX_UNLOCK:
+				printf("Mutex Unlock Requested\n");
+				// ADD additional
+				break;
 
-				case COND_WAIT:
-					printf("Waiting on Condition Variable\n");
-					// ADD additional
-					break;
+			case COND_WAIT:
+				printf("Waiting on Condition Variable\n");
+				// ADD additional
+				break;
 
-				case COND_SIGNAL:
-					printf("Condition Variable Signaled\n");
-					// ADD additional
-					break;
+			case COND_SIGNAL:
+				printf("Condition Variable Signaled\n");
+				// ADD additional
+				break;
 
-
-				default:
-					printf("INT not recognized\n");
-					break;
+			default:
+				printf("INT not recognized\n");
+				break;
 			}
 
 			setNextProcess(this);
@@ -195,10 +194,10 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 		}
 
 		/*
-		* Checks to see if the current process is going to make a service call.
-		* If so, it prints its message, advances its request queue, and
-		* interrupts the CPU.
-		*/
+		 * Checks to see if the current process is going to make a service call.
+		 * If so, it prints its message, advances its request queue, and
+		 * interrupts the CPU.
+		 */
 		else if (this->PC == getNextTrapStep(this -> current_process)) {
 			printf("\nAbout to make a service call...\n");
 			printMessage(this ->current_process);
@@ -207,21 +206,17 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 		}
 
 		/*
-		* Checks to see whether a process has completed its total number
-		* of steps. If so, it prints that its completed and resets the PC
-		* to the beginning of the program
-		*/
+		 * Checks to see whether a process has completed its total number
+		 * of steps. If so, it prints that its completed and resets the PC
+		 * to the beginning of the program
+		 */
 		if (isProcessDone(this ->current_process, this -> PC)) {
 			printf("Process Completed..\n");
-			this -> PC = -1;					// Will be incremented to 0 at top of loop.
+			this -> PC = -1; // Will be incremented to 0 at top of loop.
 		}
 
-		this->max_step_count--;			//decrement the max step.
+		this->max_step_count--; //decrement the max step.
 	}
-	SchedulerPtr s = this->scheduler;
-
-	printf("%d\n", s->current_process->pcb->pid);
-	printQueue(s, READY_QUEUE);
 
 	printf("done done done");
 
@@ -274,7 +269,7 @@ void printState(CPUPtr this) {
 	//printQueue(this->keyboard_queue);    //Get queue from the scheduler
 	printf("\n");
 	printf("Scheduler Ready Queue -");
-//	printQueue(this->scheduler->ready_queue);
+	//	printQueue(this->scheduler->ready_queue);
 	printf("\n");
 	printf("Audio Device I/O Queue -");
 	//printQueue(this->audio_queue);
@@ -371,7 +366,7 @@ int CPUDestructor(CPUPtr this) {
 //	return 0;
 //}
 /*
-int main() {
-	CPUPtr cpu = CPUConstructor(30);
+ int main() {
+ CPUPtr cpu = CPUConstructor(30);
 
-}*/
+ }*/
