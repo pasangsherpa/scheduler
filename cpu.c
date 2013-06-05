@@ -44,7 +44,7 @@ void initCPU(CPUPtr this, int totalProcess, int totalKBProcess,
 			int processtype = IO_AUDIO;
 			if (i % 2 == 1)
 				processtype = IO_VIDEO; // Create IO_VIDEO every other number.
-			ProcessPtr iop = ProcessConstructor(pid, processtype, 300, 100);
+			ProcessPtr iop = ProcessConstructor(pid, processtype, 6, 5);
 			this->scheduler->addToQueue(this->scheduler, iop,
 					this->scheduler->ready_queue);
 			pid++;
@@ -82,7 +82,6 @@ void initCPU(CPUPtr this, int totalProcess, int totalKBProcess,
 			= this->scheduler->getCurrrentProcess(this->scheduler);
 
 	ProcessPtr p = this->scheduler->getCurrrentProcess(this->scheduler);
-	printf("Current: %d\n", p->pcb->pid);
 
 	//Construct the timer (starts the timer)
 	this->timer = SysTimerConstructor((CPU) this, this->reset);
@@ -132,7 +131,6 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 					break;
 
 				case VIDEO_SERVICE_REQ:
-					printf("IO Interrupt: (Video Service Requested)\n");
 					// ADD additional
 					break;
 
@@ -143,7 +141,6 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 					break;
 
 				case KEYBOARD_SERVICE_REQ:
-					printf("IO Interrupt: (Keyboard Service Requested)\n");
 					// ADD additional
 					break;
 
@@ -153,7 +150,6 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 					break;
 
 				case AUDIO_SERVICE_REQ:
-					printf("IO Interrupt: (Audio Service Requested)\n");
 					// ADD additional
 					break;
 
@@ -194,7 +190,7 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 		}
 
 		if (this->PC == getNextTrapStep(this -> current_process)) { //time to make a service call
-			printf("Service Call made...\n");
+			printf("About to make a service call...\n");
 			printMessage(this ->current_process);
 			advanceRequest(this -> current_process);
 			interruptCPU(this, getNextTrapCode(this ->current_process), '0');

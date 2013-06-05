@@ -175,15 +175,15 @@ int printMessage(ProcessPtr this) {
 		break;
 
 	case IO_AUDIO:
-		printf("\nIO Interrupt (Audio)");
+		printf("IO Interrupt: (Audio Service Requested)\n");
 		break;
 
 	case IO_VIDEO:
-		printf("\nIO Interrupt (Video)");
+		printf("IO Interrupt: (Video Service Requested)\n");
 		break;
 
 	case KEYBOARD:
-		printf("\nKeyboard Interrupt");
+		printf("IO Interrupt: (Keyboard Service Requested)\n");
 		break;
 
 	case PRODUCER:
