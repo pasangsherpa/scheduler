@@ -110,7 +110,6 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 		printf("PC Value: %d\n", this->PC);
 		printf("Process %d (Type: %s) is running... \n", this->current_process->pcb->pid,
 				decodeProcessType(this->current_process->proc_type));
-
 		/*
 		 * Checks to see whether an interrupt has occured.
 		 * If so, it figures out what generated it and takes appropriate action.
@@ -188,7 +187,6 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 
 			setNextProcess(this);
 			printf("pid after context switch: %d\n", this -> process_pid);
-
 			// Fix! Need to check if there are others waiting!
 			this -> INT = 0;
 		}
@@ -211,14 +209,14 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 		 * to the beginning of the program
 		 */
 		if (isProcessDone(this ->current_process, this -> PC)) {
-			printf("Process Completed..\n");
+			printf("Process %d Completed..\n", this->current_process->pcb->pid);
 			this -> PC = -1; // Will be incremented to 0 at top of loop.
 		}
 
 		this->max_step_count--; //decrement the max step.
 	}
 
-	printf("done done done");
+	printf("\nThere is no more tasks in the ready quueue.");
 
 	//kill cpu
 }
