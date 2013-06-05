@@ -79,8 +79,6 @@ void initCPU(CPUPtr this, int totalProcess, int totalKBProcess,
 	this->current_process
 			= this->scheduler->getCurrrentProcess(this->scheduler);
 
-	ProcessPtr p = this->scheduler->getCurrrentProcess(this->scheduler);
-
 	//Construct the timer (starts the timer)
 	this->timer = SysTimerConstructor((CPU) this, this->reset);
 }
@@ -107,7 +105,6 @@ void interruptCPU(CPUPtr this, int the_IRQ, char the_data) {
  CPU thread runs as long as there are more steps to run.
  */
 void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
-
 	while (this->max_step_count > 0) {
 
 		this->PC++;					// Increment the PC.
@@ -220,6 +217,11 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 
 		this->max_step_count--;			//decrement the max step.
 	}
+	SchedulerPtr s = this->scheduler;
+
+	printf("%d\n", s->current_process->pcb->pid);
+	printQueue(s, READY_QUEUE);
+
 	printf("done done done");
 
 	//kill cpu
@@ -271,7 +273,7 @@ void printState(CPUPtr this) {
 	//printQueue(this->keyboard_queue);    //Get queue from the scheduler
 	printf("\n");
 	printf("Scheduler Ready Queue -");
-	printQueue(this->scheduler->ready_queue);
+//	printQueue(this->scheduler->ready_queue);
 	printf("\n");
 	printf("Audio Device I/O Queue -");
 	//printQueue(this->audio_queue);
@@ -292,24 +294,6 @@ void printState(CPUPtr this) {
 int CPUDestructor(CPUPtr this) {
 	free(this);
 	return NO_ERROR;
-}
-
-/*
- Prints out the PID of the processes in the given queue
- */
-void printQueue(Queue the_queue) {
-
-	if (IsEmpty(the_queue) == 0) {
-
-		ElementType * temp = getQueue(the_queue);
-		int list_size = Size(the_queue);
-		ProcessPtr p;
-		int index = 0;
-		for (index = 0; index < list_size; index++) {
-			p = temp[index];
-			printf("PID = %i  ", p->pcb->pid);
-		}
-	}
 }
 
 //int main (void){

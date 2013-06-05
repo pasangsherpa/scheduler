@@ -61,7 +61,7 @@ void keyboardServiceRequest(CPUPtr this);
 void keyboardServiceCompleted(CPUPtr this);
 void getKey(CPUPtr this); //
 void printState(CPUPtr this);
-void printQueue(Queue the_queue);
+//void printQueue(Queue the_queue);
 
 
 //int mutex_lock_trap_handler(CPUPtr this,MutexPtr mutex);

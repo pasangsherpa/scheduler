@@ -24,6 +24,13 @@
 typedef enum { false, true } bool;
 /******* END GENERAL ********/
 
+/********** QUEUE ***********/
+#define READY_QUEUE			1
+#define IO_QUEUE			2
+#define MUTEX_QUEUE			3
+
+/*******END QUEUE ***********/
+
 /********* PROCESS **********/
 //Process Type
 #define COMPUTE 			0

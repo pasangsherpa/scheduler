@@ -37,6 +37,7 @@ typedef struct scheduler {
         ProcessPtr(*switchProcess)(struct scheduler*, int*, int, ProcessPtr);
         int(*addToQueue)(struct scheduler*, ProcessPtr, Queue);
         ProcessPtr(*getCurrrentProcess)(struct scheduler*);
+        void (*printQueue)(struct scheduler*, int);
 
 } SchedulerStr, *SchedulerPtr;
 
@@ -46,6 +47,6 @@ int setCurrentProcess(SchedulerPtr this);
 ProcessPtr switchProcess(SchedulerPtr this, int *pc, int interrupt, ProcessPtr process);
 int addToQueue(SchedulerPtr this, ProcessPtr process, Queue Q);
 ProcessPtr getCurrentProcess(SchedulerPtr this);
-void printQueueElement(Queue queue);
+void printQueue(SchedulerPtr this, int type);
 
 #endif /* SCHEDULER_H */
