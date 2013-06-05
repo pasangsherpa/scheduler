@@ -46,8 +46,8 @@ typedef enum { false, true } bool;
 #define VIDEO_SERVICE_REQ		2
 #define VIDEO_SERVICE_COMPLETED	3
 #define KEYBOARD_SERVICE_REQ	4
-#define KEYBOARD_COMPLETED		5
-#define	AUDIO_SERVICE_REQ		6
+#define KEYBOARD_SERVICE_COMPLETED		5
+#define AUDIO_SERVICE_REQ		6
 #define AUDIO_SERVICE_COMPLETED	7
 #define MUTEX_LOCK				8
 #define MUTEX_UNLOCK			9

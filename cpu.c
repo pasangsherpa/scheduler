@@ -112,40 +112,84 @@ void interruptCPU(CPUPtr this, int the_IRQ, char the_data) {
  CPU thread runs as long as there are more steps to run.
  */
 void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
+
 	while (this->max_step_count > 0) {
-		this->max_step_count--;//decrement the max step
+
 		this->PC = this->current_process->pcb->next_step;
 		printf("Current count = %d\n", this->max_step_count);
 
-		if (this->INT == 1) {
+		if (this->INT == 1) {					// An interrupt has occured.
+
 			printf("\nINT: %d\n", this -> IRQ);
 
-			switch (this->IRQ) {
-			case TIMER_INT:
-				printf("Timer interrupt/n");
-				//saveState(this);
-				//switchProcess(this->scheduler, this->PC, 1);
-				pthread_cond_signal(&this->reset);
+			switch (this->IRQ) {			// Figure out what interrupt has occured.
 
-				break;
-			case AUDIO_SERVICE_COMPLETED: //no context switch
-				//saveState(this);
-				//switchProcess(this->scheduler, this->PC, 7);//QUEUE IS OK
+				case TIMER_INT:
+					printf("Timer interrupt/n");
+					//saveState(this);
+					//switchProcess(this->scheduler, this->PC, 1);
+					pthread_cond_signal(&this->reset);
+					break;
 
-				break;
-			case VIDEO_SERVICE_COMPLETED://no context switch
-				//saveState(this);
-				//switchProcess(this->scheduler, this->PC, 3);
+				case VIDEO_SERVICE_REQ:
+					printf("IO Interrupt: (Video Service Requested)\n");
+					// ADD additional
+					break;
 
-				break;
-			case KEYBOARD_COMPLETED://no context switch
-				saveState(this);
-				keyboardServiceCompleted(this);
-				break;
-			default:
-				printf("INT not recognized\n");
+				case VIDEO_SERVICE_COMPLETED:			//no context switch
+					printf("IO: (Video Service Completed)\n");
+					//saveState(this);
+					//switchProcess(this->scheduler, this->PC, 3);
+					break;
+
+				case KEYBOARD_SERVICE_REQ:
+					printf("IO Interrupt: (Keyboard Service Requested)\n");
+					// ADD additional
+					break;
+
+				case KEYBOARD_SERVICE_COMPLETED:
+					printf("IO: (Keyboard Service Completed)\n");
+					// ADD additional
+					break;
+
+				case AUDIO_SERVICE_REQ:
+					printf("IO Interrupt: (Audio Service Requested)\n");
+					// ADD additional
+					break;
+
+				case AUDIO_SERVICE_COMPLETED: //no context switch
+					printf("IO: (Audio Service Completed)\n");
+					//saveState(this);
+					//switchProcess(this->scheduler, this->PC, 7);//QUEUE IS OK
+					break;
+
+				case MUTEX_LOCK:
+					printf("Mutex Lock Requested\n");
+					// ADD additional
+					break;
+
+				case MUTEX_UNLOCK:
+					printf("Mutex Unlock Requested\n");
+					// ADD additional
+					break;
+
+				case COND_WAIT:
+					printf("Waiting on Condition Variable\n");
+					// ADD additional
+					break;
+
+				case COND_SIGNAL:
+					printf("Condition Variable Signaled\n");
+					// ADD additional
+					break;
+
+
+				default:
+					printf("INT not recognized\n");
+					break;
 			}
 
+			// Fix! Need to check if there are others waiting!
 			this -> INT = 0;
 		}
 
@@ -197,6 +241,8 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 			printf("Process Completed..\n");
 			this -> PC = 0;
 		}
+
+		this->max_step_count--;			//decrement the max step.
 	}
 	printf("done done done");
 

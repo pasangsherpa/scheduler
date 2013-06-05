@@ -89,7 +89,7 @@ ProcessPtr switchProcess(SchedulerPtr this, int *PC, int interrupt, ProcessPtr p
 		break;
 	case VIDEO_SERVICE_COMPLETED:
 	case AUDIO_SERVICE_COMPLETED:
-	case KEYBOARD_COMPLETED:
+	case KEYBOARD_SERVICE_COMPLETED:
 		if (!IsEmpty(this->io_queue)) {
 			process = FrontAndDequeue(this->io_queue);
 			process->pcb->state = READY;
