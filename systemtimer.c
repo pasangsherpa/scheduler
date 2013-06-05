@@ -15,12 +15,19 @@
 #include "global.h"
 #include "systemtimer.h"
 
+#ifdef __unix__
+#include <unistd.h>
+#elif defined _WIN32
+#include <windows.h>
+#define sleep(x) Sleep(1000 * x)
+#endif
+
 /*
 * Basic Constructor for the system timer.
 * Initializes the count to the quanta set in global.h.
 * Creates a thread to run the timer.
 */
-SysTimerPtr SysTimerConstructor(CPU c, pthread_cond_t condition) {
+SysTimerPtr SysTimerConstructor(CPUPtr c, pthread_cond_t condition) {
 	SysTimerPtr timer = (SysTimerPtr) malloc(sizeof(SysTimerStr));
 	timer -> cpu = c;
 	timer -> reset = condition;

@@ -13,11 +13,12 @@
 #define SYSTEMTIMER_H
 #include <pthread.h>
 
-struct CPUStr;
-typedef struct CPUStr* CPU;
+#ifndef CPU_H
+#include "cpu.h"
+#endif
 
 typedef struct timer {
-	CPU cpu;
+	CPUPtr cpu;
 	pthread_t clock_thread;
 	pthread_cond_t reset;				// Condition variable CPU uses to signal timer.
 	pthread_mutex_t mutex;			// Unused mutex only for signaling.
@@ -32,7 +33,7 @@ typedef struct timer {
 * reset - this condition variable needs to be signaled to start the clock running again
 *				after an interrupt.
 */
-SysTimerPtr SysTimerConstructor(CPU, pthread_cond_t reset);
+SysTimerPtr SysTimerConstructor(CPUPtr, pthread_cond_t reset);
 
 /**************
 ** Destructor **

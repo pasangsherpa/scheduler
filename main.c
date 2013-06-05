@@ -14,6 +14,10 @@
 #include <time.h>
 #include "cpu.h"
 
+#ifndef SYSTEMTIMER_H
+#include "systemtimer.h"
+#endif
+
 #define MINIMUM_NUM_PROCESS 1	//MIN NUM OF PROCESS TO RUN FOR EACH TYPE OF THE PROCESS.
 #define MAX_NUM_STEPS_TO_RUN 1234567890	// MAX NUMBER OF TOTAL STEPS THIS PROGRAM WILL RUN.
 #define KEYBRD_PROCESS	1
@@ -107,6 +111,8 @@ int main(int argc, char * argv[]){
 	
 	CPUPtr cpu = CPUConstructor();
 	initCPU(cpu, processNumber, keyboardProcess, ioProcess, pr_coProcess, computeBound, stepCount);
+	//Construct the timer (starts the timer)
+	SysTimerConstructor(cpu, cpu->reset);
 	runCPU(cpu);
 
 		

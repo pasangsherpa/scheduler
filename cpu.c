@@ -9,6 +9,7 @@
  *
  */
 #include "cpu.h"
+#include <pthread.h>
 
 #ifndef GLOBAL_H
 #include "global.h"
@@ -77,9 +78,6 @@ void initCPU(CPUPtr this, int totalProcess, int totalKBProcess,
 	//set the currect process in cpu.
 	this->current_process
 			= this->scheduler->getCurrrentProcess(this->scheduler);
-
-	//Construct the timer (starts the timer)
-	this->timer = SysTimerConstructor((CPU) this, this->reset);
 }
 
 /*

@@ -24,10 +24,6 @@
 #include "pcb.h"
 #endif
 
-#ifndef SYSTEMTIMER_H
-#include "systemtimer.h"
-#endif
-
 typedef struct cpu {
         int PC; 				//Program counter
 		int max_step_count; 	//Number of steps this CPU will run.
@@ -37,7 +33,6 @@ typedef struct cpu {
 		ProcessPtr current_process;	//currently running process pcb
 		int INT;				//whether INT is asserted
 		int IRQ;
-		SysTimerPtr timer;
 		pthread_cond_t reset;
 
 } CPUStr, *CPUPtr;

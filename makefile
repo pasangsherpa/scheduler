@@ -7,10 +7,10 @@ LFLAGS = -Wall $(DEBUG)
 build : $(OBJS)
 	$(CC) $(LFLAGS) $(OBJS) -o scheduler
 
-main.o: main.c cpu.h 
+main.o: main.c systemtimer.h cpu.h 
 	$(CC) $(CFLAGS) main.c
 
-cpu.o: cpu.c cpu.h scheduler.h process.h systemtimer.h mutex.h request.h queue.h global.h
+cpu.o: cpu.c cpu.h scheduler.h process.h mutex.h request.h queue.h global.h
 	$(CC) $(CFLAGS) cpu.c
 	
 scheduler.o: scheduler.c scheduler.h process.h mutex.h request.h queue.h global.h
@@ -28,7 +28,7 @@ mutex.o : mutex.c mutex.h process.h scheduler.h global.h
 request.o : request.c request.h 
 	$(CC) $(CFLAGS) request.c
 
-systemtimer.o : systemtimer.c systemtimer.h 
+systemtimer.o : systemtimer.c systemtimer.h cpu.h
 	$(CC) $(CFLAGS) systemtimer.c
 
 queue.o : queue.c queue.h
