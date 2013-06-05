@@ -94,12 +94,6 @@ void setNextProcess(CPUPtr this) {
 	this->process_pid = this->current_process->pcb->pid;
 }
 
-void saveState(CPUPtr this) {
-	// PC gets reincremented at top of CPU Run loop.
-	printf("PC being saved during context switch: %d\n", this->PC -1);
-	this->current_process->pcb->next_step = (this->PC - 1);
-}
-
 /*
  Devices call this method when they send INT signal to the CPU.
  */
@@ -131,7 +125,6 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 
 				case TIMER_INT:
 					printf("Timer interrupt/n");
-					saveState(this);
 					switchProcess(this->scheduler, &this->PC, TIMER_INT, NULL);
 
 					//  Signal to restart the timer.
@@ -139,7 +132,6 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 					break;
 
 				case VIDEO_SERVICE_REQ:
-					saveState(this);
 					switchProcess(this->scheduler, &this->PC,
 												VIDEO_SERVICE_REQ, NULL);
 					break;
@@ -151,7 +143,6 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 					break;
 
 				case KEYBOARD_SERVICE_REQ:
-					saveState(this);
 					switchProcess(this->scheduler, &this->PC,
 												KEYBOARD_SERVICE_REQ, NULL);
 					break;
@@ -164,7 +155,6 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 
 				case AUDIO_SERVICE_REQ:
 					printf("In Audio Service Request\n");
-					saveState(this);
 					switchProcess(this->scheduler, &this->PC,
 												AUDIO_SERVICE_REQ, NULL);
 					printf("pid after context switch: %d\n", this -> process_pid);

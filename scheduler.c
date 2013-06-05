@@ -83,7 +83,7 @@ ProcessPtr switchProcess(SchedulerPtr this, int *PC, int interrupt, ProcessPtr p
 	case KEYBOARD_SERVICE_REQ:
 		this->addToQueue(this, this->current_process, this->io_queue);
 		this->current_process->pcb->state = BLOCKED; //waiting on io
-		this->current_process->no_steps = *PC; //Store the current PC
+		this->current_process->no_steps = *PC - 1; //Store the current PC
 		this->setCurrentProcess(this);
 		*PC = this->current_process->no_steps; //Start where it was left at
 		break;
