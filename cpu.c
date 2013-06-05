@@ -94,6 +94,12 @@ void setNextProcess(CPUPtr this) {
 	this->process_pid = this->current_process->pcb->pid;
 }
 
+void saveState(CPUPtr this) {
+	// PC gets reincremented at top of CPU Run loop.
+	printf("PC being saved during context switch: %d\n", this->PC -1);
+	this->current_process->pcb->next_step = (this->PC - 1);
+}
+
 /*
  Devices call this method when they send INT signal to the CPU.
  */
@@ -121,42 +127,53 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 		*/
 		if (this->INT == 1) {
 
-			switch (this->IRQ) {			// Figure out what interrupt has occured.
+			switch (this->IRQ) {			// Figure out which interrupt has occured.
 
 				case TIMER_INT:
 					printf("Timer interrupt/n");
-					//saveState(this);
-					//switchProcess(this->scheduler, this->PC, 1);
+					saveState(this);
+					switchProcess(this->scheduler, &this->PC, TIMER_INT, NULL);
+
+					//  Signal to restart the timer.
 					pthread_cond_signal(&this->reset);
 					break;
 
 				case VIDEO_SERVICE_REQ:
-					// ADD additional
+					saveState(this);
+					switchProcess(this->scheduler, &this->PC,
+												VIDEO_SERVICE_REQ, NULL);
 					break;
 
 				case VIDEO_SERVICE_COMPLETED:			//no context switch
 					printf("IO: (Video Service Completed)\n");
-					//saveState(this);
-					//switchProcess(this->scheduler, this->PC, 3);
+					switchProcess(this->scheduler, &this->PC,
+												VIDEO_SERVICE_COMPLETED, NULL);
 					break;
 
 				case KEYBOARD_SERVICE_REQ:
-					// ADD additional
+					saveState(this);
+					switchProcess(this->scheduler, &this->PC,
+												KEYBOARD_SERVICE_REQ, NULL);
 					break;
 
 				case KEYBOARD_SERVICE_COMPLETED:
 					printf("IO: (Keyboard Service Completed)\n");
-					// ADD additional
+					switchProcess(this->scheduler, &this->PC,
+												KEYBOARD_SERVICE_COMPLETED, NULL);
 					break;
 
 				case AUDIO_SERVICE_REQ:
-					// ADD additional
+					printf("In Audio Service Request\n");
+					saveState(this);
+					switchProcess(this->scheduler, &this->PC,
+												AUDIO_SERVICE_REQ, NULL);
+					printf("pid after context switch: %d\n", this -> process_pid);
 					break;
 
-				case AUDIO_SERVICE_COMPLETED: //no context switch
+				case AUDIO_SERVICE_COMPLETED: 		//no context switch
 					printf("IO: (Audio Service Completed)\n");
-					//saveState(this);
-					//switchProcess(this->scheduler, this->PC, 7);//QUEUE IS OK
+					switchProcess(this->scheduler, &this->PC,
+												AUDIO_SERVICE_COMPLETED, NULL);
 					break;
 
 				case MUTEX_LOCK:
@@ -194,7 +211,7 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 		* If so, it prints its message, advances its request queue, and
 		* interrupts the CPU.
 		*/
-		if (this->PC == getNextTrapStep(this -> current_process)) {
+		else if (this->PC == getNextTrapStep(this -> current_process)) {
 			printf("About to make a service call...\n");
 			printMessage(this ->current_process);
 			advanceRequest(this -> current_process);
@@ -216,11 +233,6 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 	printf("done done done");
 
 	//kill cpu
-}
-
-void saveState(CPUPtr this) {
-	// PC gets reincremented at top of CPU Run loop.
-	this->current_process->pcb->next_step = (this->PC - 1);
 }
 
 void keyboardServiceRequest(CPUPtr this) { //a key press should trigger this method.
