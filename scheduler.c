@@ -20,6 +20,7 @@ SchedulerPtr SchedulerConstructor(int max_processes) {
 	SchedulerPtr scheduler = (SchedulerPtr) malloc(sizeof(SchedulerStr));
 	scheduler->ready_queue = CreateQueue(max_processes);
 	scheduler->io_queue = CreateQueue(max_processes);
+	scheduler->kb_queue = CreateQueue(max_processes);
 	scheduler->mutex = MutexConstructor();
 
 	//Pointers to functions.

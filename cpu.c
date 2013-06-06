@@ -45,24 +45,26 @@ void initCPU(CPUPtr this, int totalProcess, int totalKBProcess,
 	}
 
 	for (i = 0; i < totalComputeProcess; i++) {
-		ProcessPtr cm = ProcessConstructor(pid, COMPUTE, 300, 100);
+		ProcessPtr cm = ProcessConstructor(pid, COMPUTE, 5, 2);
 		this->scheduler->addToQueue(this->scheduler, cm,
 				this->scheduler->ready_queue);
 		pid++;
 	}
 
 	for (i = 0; i < totalKBProcess; i++) {
-		ProcessPtr kbp = ProcessConstructor(pid, KEYBOARD, 300, 100); // 300 & 100 dummy values
+		ProcessPtr kbp = ProcessConstructor(pid, KEYBOARD, 20, 15); // 300 & 100 dummy values
 		this->scheduler->addToQueue(this->scheduler, kbp,
-				this->scheduler->ready_queue);
+				this->scheduler->kb_queue);
 		pid++;
 	}
 
 	for (i = 0; i < totalPrCoProcess; i++) {
 		int processtype = PRODUCER;
-		if (i % 2 == 1)
+
+		if (i % 2 == 1) {
 			processtype = CONSUMER;
-		ProcessPtr prcp = ProcessConstructor(pid, processtype, 300, 100);
+		}
+		ProcessPtr prcp = ProcessConstructor(pid, processtype, 50, 15);
 		this->scheduler->addToQueue(this->scheduler, prcp,
 				this->scheduler->ready_queue);
 		pid++;
@@ -161,13 +163,13 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 				break;
 
 			case MUTEX_LOCK:
-				printf("Mutex Lock Requested\n");
-				switchProcess(this->scheduler, &this->PC, MUTEX_LOCK, NULL);
+				printf("\nMutex Lock Requested\n");
+				//switchProcess(this->scheduler, &this->PC, MUTEX_LOCK, NULL);
 				break;
 
 			case MUTEX_UNLOCK:
-				printf("Mutex Unlock Requested\n");
-				switchProcess(this->scheduler, &this->PC, MUTEX_UNLOCK, NULL);
+				printf("\nMutex Unlock Requested\n");
+				//switchProcess(this->scheduler, &this->PC, MUTEX_UNLOCK, NULL);
 				break;
 
 			case COND_WAIT:

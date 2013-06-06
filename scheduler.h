@@ -27,6 +27,7 @@
 typedef struct scheduler {
         Queue ready_queue;
         Queue io_queue;
+        Queue kb_queue;
         MutexPtr mutex;
 
         ProcessPtr current_process;

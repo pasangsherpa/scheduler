@@ -74,11 +74,12 @@ ProcessPtr ProcessConstructor(int pid, int proc_type, int no_steps,
 				break;
 
 			case PRODUCER:
-				// Needs to be filled in.
-				break;
-
 			case CONSUMER:
-				// Needs to be filled in.
+				if (i % 2 == 1) {
+					code_array[i] = MUTEX_LOCK;
+				} else {
+					code_array[i] = MUTEX_UNLOCK;
+				}
 				break;
 
 			default:
