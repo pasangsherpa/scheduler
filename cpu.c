@@ -126,7 +126,7 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 			case VIDEO_SERVICE_REQ:
 				switchProcess(this->scheduler, &this->PC, VIDEO_SERVICE_REQ,
 						NULL);
-				IODeviceConstructor(this->interruptController, IO_VIDEO);
+				IODeviceConstructor(this->interruptController, IO_VIDEO, '0');
 				break;
 
 			case VIDEO_SERVICE_COMPLETED: //no context switch
@@ -139,11 +139,11 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 				printf("IO Interrupt: (Keyboard Service Requested)\n");
 				switchProcess(this->scheduler, &this->PC, KEYBOARD_SERVICE_REQ,
 						NULL);
-				IODeviceConstructor(this->interruptController, IO_KEYBOARD);
+				IODeviceConstructor(this->interruptController, IO_KEYBOARD, interrupt -> kb_data);
 				break;
 
 			case KEYBOARD_SERVICE_COMPLETED:
-				printf("\nIO: (Keyboard Service Completed)\n");
+				printf("\nIO: (Keyboard Service Completed) %c pressed\n", interrupt -> kb_data);
 				switchProcess(this->scheduler, &this->PC,
 						KEYBOARD_SERVICE_COMPLETED, NULL);
 				break;
@@ -151,7 +151,7 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 			case AUDIO_SERVICE_REQ:
 				switchProcess(this->scheduler, &this->PC, AUDIO_SERVICE_REQ,
 						NULL);
-				IODeviceConstructor(this->interruptController, IO_AUDIO);
+				IODeviceConstructor(this->interruptController, IO_AUDIO, '0');
 				break;
 
 			case AUDIO_SERVICE_COMPLETED: //no context switch

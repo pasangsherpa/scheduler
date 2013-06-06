@@ -22,10 +22,11 @@
 #define sleep(x) Sleep(1000 * x)
 #endif
 
- IODevicePtr IODeviceConstructor(ICPtr ic, int type) {
+ IODevicePtr IODeviceConstructor(ICPtr ic, int type, char data) {
  	IODevicePtr device = (IODevicePtr) malloc(sizeof(IODeviceStr));
  	device -> interruptController = ic;
  	device -> device_type = type;
+ 	device -> c = data;
 
  	pthread_create(&device -> device_thread, NULL, DeviceRun, (void *) device);
  	return device;
@@ -61,7 +62,7 @@ void *DeviceRun(void *args) {
 			break;
 	}
 
-	interruptCPU(device->interruptController, interrupt, '0');
+	interruptCPU(device->interruptController, interrupt, device -> c);
 	return 0;
 }
 
