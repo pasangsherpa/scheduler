@@ -95,7 +95,7 @@ void setNextProcess(CPUPtr this) {
  CPU thread runs as long as there are more steps to run.
  */
 void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
-	while (this->max_step_count > 0) {
+	while (500 > 0) {
 		sleep(1);
 		this->PC++; // Increment the PC.
 		printf("Current count = %d\n", this->max_step_count);
@@ -128,7 +128,7 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 				break;
 
 			case VIDEO_SERVICE_COMPLETED: //no context switch
-				printf("IO: (Video Service Completed)\n");
+				printf("\nIO: (Video Service Completed)\n");
 				switchProcess(this->scheduler, &this->PC,
 						VIDEO_SERVICE_COMPLETED, NULL);
 				break;
@@ -139,20 +139,19 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 				break;
 
 			case KEYBOARD_SERVICE_COMPLETED:
-				printf("IO: (Keyboard Service Completed)\n");
+				printf("\nIO: (Keyboard Service Completed)\n");
 				switchProcess(this->scheduler, &this->PC,
 						KEYBOARD_SERVICE_COMPLETED, NULL);
 				break;
 
 			case AUDIO_SERVICE_REQ:
-				printf("In Audio Service Request\n");
 				switchProcess(this->scheduler, &this->PC, AUDIO_SERVICE_REQ,
 						NULL);
 				IODeviceConstructor(this->interruptController, IO_AUDIO);
 				break;
 
 			case AUDIO_SERVICE_COMPLETED: //no context switch
-				printf("IO: (Audio Service Completed)\n");
+				printf("\nIO: (Audio Service Completed)\n");
 				switchProcess(this->scheduler, &this->PC,
 						AUDIO_SERVICE_COMPLETED, NULL);
 				break;
@@ -183,7 +182,6 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 			}
 
 			setNextProcess(this);
-			printf("pid after context switch: %d\n", this -> process_pid);
 
 			// Destroy the interrupt.
 			interruptDestructor(interrupt);
