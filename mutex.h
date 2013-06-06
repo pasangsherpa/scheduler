@@ -15,12 +15,12 @@
 #include "process.h"
 #endif
 
-#ifndef SCHEDULER_H
-#include "scheduler.h"
-#endif
-
 #ifndef GLOBAL_H
 #include "global.h"
+#endif
+
+#ifndef QUEUE_H
+#include "queue.h"
 #endif
 
 typedef struct mutex {
@@ -49,7 +49,5 @@ ProcessPtr switchOwner(MutexPtr mutex);
 bool MutexIsLocked(MutexPtr mutex);
 void MutexLock(MutexPtr mutex, bool lock);
 void MutexAdd(MutexPtr mutex, ProcessPtr);
-void Mutex_Lock(MutexPtr mutex, ProcessPtr process, SchedulerPtr scheduler);
-void Mutex_Unlock(MutexPtr mutex, ProcessPtr process, SchedulerPtr scheduler);
 
 #endif
