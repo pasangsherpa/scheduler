@@ -14,13 +14,18 @@
 
 typedef struct iodevice {
 	int device_type;
-	CPUPtr cpu;
+	ICPtr interruptController;
 
 	pthread_t device_thread;
-	pthread_cond_t reset;				// Condition variable CPU uses to signal timer.
-	pthread_mutex_t mutex;			// Unused mutex only for signaling.
 
 } IODeviceStr, *IODevicePtr;
+
+
+// Constructor
+IODevicePtr IODeviceConstructor(ICPtr ic, int type);
+
+// Destructor
+void IODeviceDestructor(IODevicePtr this);
 
 void *DeviceRun(void *args);
 
