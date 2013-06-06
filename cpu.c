@@ -12,7 +12,6 @@
 #include <pthread.h>
 #include "cpu.h"
 
-
 CPUPtr CPUConstructor() {
 	CPUPtr result = (CPUPtr) malloc(sizeof(CPUStr));
 	result->PC = -1; // Initial PC (will be incremented to 0).
@@ -80,7 +79,8 @@ void initCPU(CPUPtr this, int totalProcess, int totalKBProcess,
 
 	this -> key = (KeyThreadPtr) KeyThreadConstructor(this -> interruptController);
 	// Start timer.
-	this -> timer = (SysTimerPtr) SysTimerConstructor(this -> interruptController, this -> reset);
+	this -> timer = (SysTimerPtr) SysTimerConstructor(
+			this -> interruptController, this -> reset);
 }
 
 /*
@@ -91,17 +91,17 @@ void setNextProcess(CPUPtr this) {
 	this->process_pid = this->current_process->pcb->pid;
 }
 
-
 /*
  CPU thread runs as long as there are more steps to run.
  */
 void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
-	while (500 > 0) {
+	while (this->max_step_count > 0) {
 		sleep(1);
 		this->PC++; // Increment the PC.
 		printf("Current count = %d\n", this->max_step_count);
 		printf("PC Value: %d\n", this->PC);
-		printf("Process %d (Type: %s) is running... \n", this->current_process->pcb->pid,
+		printf("Process %d (Type: %s) is running... \n",
+				this->current_process->pcb->pid,
 				decodeProcessType(this->current_process->proc_type));
 		/*
 		 * Checks to see whether an interrupt has occured.
@@ -110,7 +110,8 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 		if (isInterruptWaiting(this->interruptController)) {
 
 			// Retrieve the interrupt.
-			interruptPtr interrupt = retrieveInterrupt(this->interruptController);
+			interruptPtr interrupt = retrieveInterrupt(
+					this->interruptController);
 
 			switch (interrupt->the_irq) { // Figure out which interrupt has occured.
 
@@ -161,12 +162,12 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 
 			case MUTEX_LOCK:
 				printf("Mutex Lock Requested\n");
-				// ADD additional
+				switchProcess(this->scheduler, &this->PC, MUTEX_LOCK, NULL);
 				break;
 
 			case MUTEX_UNLOCK:
 				printf("Mutex Unlock Requested\n");
-				// ADD additional
+				switchProcess(this->scheduler, &this->PC, MUTEX_UNLOCK, NULL);
 				break;
 
 			case COND_WAIT:
@@ -200,7 +201,7 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 			printMessage(this ->current_process);
 			advanceRequest(this -> current_process);
 			interruptCPU(this->interruptController,
-										getNextTrapCode(this ->current_process), '0');
+					getNextTrapCode(this ->current_process), '0');
 		}
 
 		/*
@@ -216,9 +217,8 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 		this->max_step_count--; //decrement the max step.
 	}
 
-	printf("\nThere are no more tasks in the ready queue.");
-
-	//kill cpu
+	printf("\nMax Count reached.");
+	CPUDestructor(this);
 }
 
 void keyboardServiceRequest(CPUPtr this) { //a key press should trigger this method.

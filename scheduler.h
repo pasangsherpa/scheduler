@@ -20,14 +20,14 @@
 #include "process.h"
 #endif
 
-//#ifndef MUTEX_H
-//#include "mutex.h"
-//#endif
+#ifndef MUTEX_H
+#include "mutex.h"
+#endif
 
 typedef struct scheduler {
         Queue ready_queue;
         Queue io_queue;
-//        MutexPtr mutex;
+        MutexPtr mutex;
 
         ProcessPtr current_process;
 

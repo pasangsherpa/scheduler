@@ -18,11 +18,16 @@
 #define ERROR				-1
 #define QUEUE_SIZE 			50
 #define MAX_PROCESS			50
-#define QUANTA	8
-#define IO_QUANTA_LOWER 0.1
-#define IO_QUANTA_UPPER 0.5
+#define QUANTA				8
+#define IO_QUANTA_LOWER 	0.1
+#define IO_QUANTA_UPPER 	0.5
 typedef enum { false, true } bool;
 /******* END GENERAL ********/
+
+/****** MUTEX **************/
+#define NOT_WAITING			-1
+/****** END MUTEX **********/
+
 
 /********** QUEUE ***********/
 #define READY_QUEUE			1
@@ -40,7 +45,6 @@ typedef enum { false, true } bool;
 #define IO_AUDIO				4
 #define IO_VIDEO 			5
 #define IO_DISK				6
-#deinfe IO_KEYBOARD 	7
 //Process State
 #define RUNNING 			0
 #define	READY				1

@@ -20,7 +20,7 @@ SchedulerPtr SchedulerConstructor(int max_processes) {
 	SchedulerPtr scheduler = (SchedulerPtr) malloc(sizeof(SchedulerStr));
 	scheduler->ready_queue = CreateQueue(max_processes);
 	scheduler->io_queue = CreateQueue(max_processes);
-	//scheduler->mutex = MutexConstructor();
+	scheduler->mutex = MutexConstructor();
 
 	//Pointers to functions.
 	scheduler->destroy = SchedulerDestructor;
@@ -62,48 +62,68 @@ ProcessPtr switchProcess(SchedulerPtr this, int *PC, int interrupt,
 	ProcessPtr process = NULL;
 	printf("\nServicing Interrupt....\n");
 	switch (interrupt) {
-		case TIMER_INT:
-			printf("Time quanta for process %d is up.\n", this->current_process->pcb->pid);
-			this->addToQueue(this, this->current_process, this->ready_queue);
+	case TIMER_INT:
+		printf("Time quanta for process %d is up.\n",
+				this->current_process->pcb->pid);
+		this->addToQueue(this, this->current_process, this->ready_queue);
+		this->current_process->pcb->state = READY;
+		this->current_process->pcb->next_step = *PC; //Store the current PC
+		this->setCurrentProcess(this);
+		printf("Loading next process from Ready Queue.\n");
+		printf("Process %d is running\n", this->current_process->pcb->pid);
+		*PC = this->current_process->pcb->next_step; //Start where it was left at
+		break;
+
+	case VIDEO_SERVICE_REQ:
+	case AUDIO_SERVICE_REQ:
+	case KEYBOARD_SERVICE_REQ:
+		printf("IO Interrupt occured.\n");
+		printf("Blocking process %d ......\n", this->current_process->pcb->pid);
+		this->addToQueue(this, this->current_process, this->io_queue);
+		this->current_process->pcb->state = BLOCKED; //waiting on io
+		this->current_process->pcb->next_step = *PC - 1; //Store the current PC
+		this->setCurrentProcess(this);
+		*PC = this->current_process->pcb->next_step; //Start where it was left at
+		break;
+
+	case VIDEO_SERVICE_COMPLETED:
+	case AUDIO_SERVICE_COMPLETED:
+	case KEYBOARD_SERVICE_COMPLETED:
+		if (!IsEmpty(this->io_queue)) {
+			process = FrontAndDequeue(this->io_queue);
+			process->pcb->state = READY;
+			this->addToQueue(this, process, this->ready_queue);
+		}
+		break;
+
+	case MUTEX_LOCK:
+		if (!this->mutex->mutex_locked && !IsEmpty(this->mutex->mutex_queue)) {
+			this->mutex->lock(this->mutex, true);
+			this->current_process->pcb->waiting_on = NOT_WAITING;
+			this->mutex->owner = this->current_process;
 			this->current_process->pcb->state = READY;
-			this->current_process->pcb->next_step = *PC; //Store the current PC
-			this->setCurrentProcess(this);
-			printf("Loading next process from Ready Queue.\n");
-			printf("Process %d is running\n", this->current_process->pcb->pid);
-			*PC = this->current_process->pcb->next_step; //Start where it was left at
-			break;
-
-		case VIDEO_SERVICE_REQ:
-		case AUDIO_SERVICE_REQ:
-		case KEYBOARD_SERVICE_REQ:
-			printf("IO Interrupt occured.\n");
-			printf("Blocking process %d ......\n", this->current_process->pcb->pid);
-			this->addToQueue(this, this->current_process, this->io_queue);
-			this->current_process->pcb->state = BLOCKED; //waiting on io
-			this->current_process->pcb->next_step = *PC - 1; //Store the current PC
-			this->setCurrentProcess(this);
-			*PC = this->current_process->pcb->next_step; //Start where it was left at
-			break;
-
-		case VIDEO_SERVICE_COMPLETED:
-		case AUDIO_SERVICE_COMPLETED:
-		case KEYBOARD_SERVICE_COMPLETED:
-			if (!IsEmpty(this->io_queue)) {
-				process = FrontAndDequeue(this->io_queue);
-				process->pcb->state = READY;
-				this->addToQueue(this, process, this->ready_queue);
-			}
-			break;
-
-	case MUTEX_LOCK:  //if a process upcalls the scheduler for mutex lock, we know that it is blocked.
-		this->current_process->pcb->state = BLOCKED;
+			FrontAndDequeue(this->mutex->mutex_queue);
+			this->addToQueue(this, this->current_process, this->ready_queue);
+		} else {
+			this->current_process->pcb->waiting_on = this->mutex->mutex_id;
+			this->current_process->pcb->state = BLOCKED;
+			this->addToQueue(this, this->current_process, this->mutex->mutex_queue);
+		}
 		FrontAndDequeue(this->ready_queue);//the process needs to be removed from the ready queue.
 		this->setCurrentProcess(this);
 
 		break;
 	case MUTEX_UNLOCK:
-		prcss->pcb->state = READY;
-		this->addToQueue(this, prcss, this->ready_queue);
+		if (this->mutex->owner->pcb->pid == this->current_process->pcb->pid) {
+			this->mutex->lock(this->mutex, false);
+			if (!IsEmpty(this->mutex->mutex_queue)) {
+				process = (ProcessPtr) FrontAndDequeue(this->mutex->mutex_queue);
+				this->mutex->owner = process;
+				process->pcb->state = READY;
+			}
+			this->mutex->owner = NULL;
+			this->addToQueue(this, process, this->ready_queue);
+		}
 		break;
 
 	case COND_WAIT:
@@ -112,6 +132,8 @@ ProcessPtr switchProcess(SchedulerPtr this, int *PC, int interrupt,
 	case COND_SIGNAL:
 		break;
 	default:
+		FrontAndDequeue(this->ready_queue);//the process needs to be removed from the ready queue.
+		this->setCurrentProcess(this);
 		break;
 	}
 

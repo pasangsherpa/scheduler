@@ -25,7 +25,7 @@ process.o : process.c process.h pcb.h global.h
 pcb.o : pcb.c pcb.h global.h
 	$(CC) $(CFLAGS) pcb.c
 	
-mutex.o : mutex.c mutex.h process.h scheduler.h global.h
+mutex.o : mutex.c mutex.h process.h global.h
 	$(CC) $(CFLAGS) mutex.c
 	
 request.o : request.c request.h 
@@ -37,8 +37,8 @@ systemtimer.o : systemtimer.c systemtimer.h interruptController.h
 queue.o : queue.c queue.h
 	$(CC) $(CFLAGS) queue.c
 
-interrutpt.o : interrutpt.c interrutpt.h global.h
-	$(CC) $(CFLAGS) interrutpt.c
+interrupt.o : interrupt.c interrupt.h global.h
+	$(CC) $(CFLAGS) interrupt.c
 
 iodevice.o : iodevice.c iodevice.h global.h interrupt.h interruptController.h queue.h
 	$(CC) $(CFLAGS) iodevice.c
