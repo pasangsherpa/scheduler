@@ -74,8 +74,15 @@ ProcessPtr ProcessConstructor(int pid, int proc_type, int no_steps,
 				break;
 
 			case PRODUCER:
-			case CONSUMER:
 				if (i % 2 == 1) {
+					code_array[i] = MUTEX_LOCK;
+				} else {
+					code_array[i] = MUTEX_UNLOCK;
+				}
+				break;
+
+			case CONSUMER:
+				if (i % 2 == 0) {
 					code_array[i] = MUTEX_LOCK;
 				} else {
 					code_array[i] = MUTEX_UNLOCK;

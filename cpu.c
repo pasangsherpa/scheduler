@@ -44,7 +44,7 @@ void initCPU(CPUPtr this, int totalProcess, int totalKBProcess,
 		pid++;
 	}
 
-	for (i = 0; i < totalComputeProcess; i++) {
+	for (i = 0; i < totalComputeProcess - (totalPrCoProcess); i++) {
 		ProcessPtr cm = ProcessConstructor(pid, COMPUTE, 5, 2);
 		this->scheduler->addToQueue(this->scheduler, cm,
 				this->scheduler->ready_queue);
@@ -58,13 +58,13 @@ void initCPU(CPUPtr this, int totalProcess, int totalKBProcess,
 		pid++;
 	}
 
-	for (i = 0; i < totalPrCoProcess; i++) {
+	for (i = 0; i < totalPrCoProcess * 2; i++) {
 		int processtype = PRODUCER;
 
 		if (i % 2 == 1) {
 			processtype = CONSUMER;
 		}
-		ProcessPtr prcp = ProcessConstructor(pid, processtype, 50, 15);
+		ProcessPtr prcp = ProcessConstructor(pid, processtype, 50, 10);
 		this->scheduler->addToQueue(this->scheduler, prcp,
 				this->scheduler->ready_queue);
 		pid++;
