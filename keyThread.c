@@ -37,6 +37,7 @@ void *KeyRun(void *args) {
 
 	while (true) {
 		key -> c = getchar();
+		getchar();
 		interruptCPU(key -> interruptController, KEYBOARD_SERVICE_REQ, key -> c);
 	}
 }

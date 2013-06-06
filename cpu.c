@@ -78,6 +78,7 @@ void initCPU(CPUPtr this, int totalProcess, int totalKBProcess,
 	this->current_process
 			= this->scheduler->getCurrrentProcess(this->scheduler);
 
+	this -> key = (KeyThreadPtr) KeyThreadConstructor(this -> interruptController);
 	// Start timer.
 	this -> timer = (SysTimerPtr) SysTimerConstructor(this -> interruptController, this -> reset);
 }
@@ -134,8 +135,10 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 				break;
 
 			case KEYBOARD_SERVICE_REQ:
+				printf("IO Interrupt: (Keyboard Service Requested)\n");
 				switchProcess(this->scheduler, &this->PC, KEYBOARD_SERVICE_REQ,
 						NULL);
+				IODeviceConstructor(this->interruptController, IO_KEYBOARD);
 				break;
 
 			case KEYBOARD_SERVICE_COMPLETED:

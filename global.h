@@ -40,6 +40,7 @@ typedef enum { false, true } bool;
 #define IO_AUDIO				4
 #define IO_VIDEO 			5
 #define IO_DISK				6
+#deinfe IO_KEYBOARD 	7
 //Process State
 #define RUNNING 			0
 #define	READY				1
