@@ -13,6 +13,8 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include "global.h"
+#include "interrupt.h"
+#include "interruptController.h"
 #include "systemtimer.h"
 
 #ifdef __unix__
@@ -27,9 +29,9 @@
 * Initializes the count to the quanta set in global.h.
 * Creates a thread to run the timer.
 */
-SysTimerPtr SysTimerConstructor(CPUPtr c, pthread_cond_t condition) {
+SysTimerPtr SysTimerConstructor(ICPtr ic, pthread_cond_t condition) {
 	SysTimerPtr timer = (SysTimerPtr) malloc(sizeof(SysTimerStr));
-	timer -> cpu = c;
+	timer -> interruptController = ic;
 	timer -> reset = condition;
 	timer -> mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -51,7 +53,7 @@ void *SysTimerRun(void *args) {
 
 	while (true) {
 		sleep(QUANTA);
-		interruptCPU(timer -> cpu, TIMER_INT, '0');
+		interruptCPU(timer -> interruptController, TIMER_INT, '0');
 		pthread_cond_wait(&timer -> reset, &timer -> mutex);
 	}
 }

@@ -18,7 +18,7 @@
 #endif
 
 typedef struct timer {
-	CPUPtr cpu;
+	ICPtr interruptController
 	pthread_t clock_thread;
 	pthread_cond_t reset;				// Condition variable CPU uses to signal timer.
 	pthread_mutex_t mutex;			// Unused mutex only for signaling.
@@ -33,7 +33,7 @@ typedef struct timer {
 * reset - this condition variable needs to be signaled to start the clock running again
 *				after an interrupt.
 */
-SysTimerPtr SysTimerConstructor(CPUPtr, pthread_cond_t reset);
+SysTimerPtr SysTimerConstructor(ICPtr, pthread_cond_t reset);
 
 /**************
 ** Destructor **

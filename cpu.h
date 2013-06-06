@@ -32,6 +32,7 @@ typedef struct cpu {
 		char buffer_data;
 		ProcessPtr current_process;	//currently running process pcb
 		ICPtr interruptController;
+		SysTimerPtr timer;
 		pthread_cond_t reset;
 
 } CPUStr, *CPUPtr;
