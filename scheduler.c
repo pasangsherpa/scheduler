@@ -60,19 +60,24 @@ int setCurrentProcess(SchedulerPtr this) {
 ProcessPtr switchProcess(SchedulerPtr this, int *PC, int interrupt,
 		ProcessPtr prcss) {
 	ProcessPtr process = NULL;
-
+	printf("\nServicing Interrupt....\n");
 	switch (interrupt) {
 		case TIMER_INT:
+			printf("Time quanta for process %d is up.\n", this->current_process->pcb->pid);
 			this->addToQueue(this, this->current_process, this->ready_queue);
 			this->current_process->pcb->state = READY;
 			this->current_process->pcb->next_step = *PC; //Store the current PC
 			this->setCurrentProcess(this);
+			printf("Loading next process from Ready Queue.\n");
+			printf("Process %d is running\n", this->current_process->pcb->pid);
 			*PC = this->current_process->pcb->next_step; //Start where it was left at
 			break;
 
 		case VIDEO_SERVICE_REQ:
 		case AUDIO_SERVICE_REQ:
 		case KEYBOARD_SERVICE_REQ:
+			printf("IO Interrupt occured.\n");
+			printf("Blocking process %d ......\n", this->current_process->pcb->pid);
 			this->addToQueue(this, this->current_process, this->io_queue);
 			this->current_process->pcb->state = BLOCKED; //waiting on io
 			this->current_process->pcb->next_step = *PC - 1; //Store the current PC

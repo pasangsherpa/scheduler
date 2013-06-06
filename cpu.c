@@ -96,6 +96,7 @@ void setNextProcess(CPUPtr this) {
  */
 void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 	while (this->max_step_count > 0) {
+		sleep(1);
 		this->PC++; // Increment the PC.
 		printf("Current count = %d\n", this->max_step_count);
 		printf("PC Value: %d\n", this->PC);
@@ -113,7 +114,7 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 			switch (interrupt->the_irq) { // Figure out which interrupt has occured.
 
 			case TIMER_INT:
-				printf("Timer interrupt/n");
+				printf("\nTimer interrupt\n");
 				switchProcess(this->scheduler, &this->PC, TIMER_INT, NULL);
 
 				//  Signal to restart the timer.
@@ -281,45 +282,6 @@ void printState(CPUPtr this) {
 	printf("waiting\n");
 	printf("----------------------------------------------------\n");
 }
-
-/**
- * Print Queue
- */
-void printQueueElement(CPUPtr this, int q_type) {
-	char* name;
-	Queue Q;
-	int i;
-	switch (q_type) {
-	case (READY_QUEUE):
-		Q = this->scheduler->ready_queue;
-		name = "Ready Queue";
-		break;
-	case (IO_QUEUE):
-		Q = this->scheduler->io_queue;
-		name = "IO Queue";
-		break;
-	case (MUTEX_QUEUE):
-		//		Q = this->mutex->mutex_queue;
-		name = "Mutex Queue";
-		break;
-	default:
-		Q = this->scheduler->ready_queue;
-		name = "Ready Queue";
-		break;
-	}
-	printf("size rq: %d\n\n", Size(this->scheduler->ready_queue));
-
-	ProcessPtr* p = (ProcessPtr*) getQueue(Q);
-
-	printf("%s = ", name);
-	for (i = 0; i < Size(Q); i++) {
-//		printf("%d:", p[i]->pcb->pid);
-	}
-
-	printf("\n");
-}
-
-
 
 //Destructor.
 int CPUDestructor(CPUPtr this) {

@@ -15,6 +15,12 @@
 #include <time.h>
 #include "iodevice.h"
 
+#ifdef __unix__
+#include <unistd.h>
+#elif defined _WIN32
+#include <windows.h>
+#define sleep(x) Sleep(1000 * x)
+#endif
 
  IODevicePtr IODeviceConstructor(ICPtr ic, int type) {
  	IODevicePtr device = (IODevicePtr) malloc(sizeof(IODeviceStr));
@@ -52,6 +58,7 @@ void *DeviceRun(void *args) {
 	}
 
 	interruptCPU(device->interruptController, interrupt, '0');
+	return 0;
 }
 
 /*
