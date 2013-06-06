@@ -30,6 +30,7 @@
 
 typedef struct iodevice {
 	int device_type;
+	char c;
 	ICPtr interruptController;
 
 	pthread_t device_thread;
@@ -38,7 +39,7 @@ typedef struct iodevice {
 
 
 // Constructor
-IODevicePtr IODeviceConstructor(ICPtr ic, int type);
+IODevicePtr IODeviceConstructor(ICPtr ic, int type, char c);
 
 // Destructor
 void IODeviceDestructor(IODevicePtr this);
