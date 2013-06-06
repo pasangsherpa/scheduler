@@ -9,29 +9,21 @@
  *
  */
 
- #ifndef GLOBAL_H
- #include "global.h"
-#endif
 
-
- typedef struct interrupt {
-	int the_irq;
-	char kb_data;				// Data from a keyboard interrupt.
-
-} interruptStr, *interruptPtr;
-
- typedef struct interruptController {
+ typedef struct IC {
 	Queue interruptQueue;
-	interrupt timer;
+	interruptPtr timer;
 
 } ICStr, *ICPtr;
 
+// Constructor
+ICPtr ICConstructor();
 
 // Returns bool true if there is an interrupt waiting to be serviced.
 bool isInterruptwaiting(ICPtr this);
 
 // Returns the interrupt that is waiting.
-interrupt retrieveInterrupt(ICPtr this);
+interruptPtr retrieveInterrupt(ICPtr this);
 
 // Used by processes and devices to signal an interrupt
 void interruptCPU(ICPtr this, int the_IRQ, char the_data)

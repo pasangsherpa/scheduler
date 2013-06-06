@@ -11,17 +11,12 @@
 
  #include <stdio.h>
  #include <stdlib.h>
+ #include "global.h"
+ #include "interrupt.h"
  #include "queue.h"
+ #include "interruptController.h"
 
-// Constructors for both
-interruptPtr interruptConstructor(int irq, char data) {
- 	interruptPtr interrupt = (interruptPtr) malloc(sizeof(interruptStr));
- 	interrupt->the_irq = irq;
- 	interrupt->kb_data = data;
-
- 	return interrupt;
-}
-
+// Constructor
 ICPtr ICConstructor() {
  	ICPtr ic = (ICPtr) malloc(sizeof(ICStr));
  	ic->interruptQueue = CreateQueue(QUEUE_SIZE);
@@ -30,15 +25,12 @@ ICPtr ICConstructor() {
  	return ic;
 }
 
-// Destructors for both
+// Destructor
 void ICDestructor(ICPtr this) {
 	DisposeQueue(this->interruptQueue);
  	free(this);
 }
 
-void interruptDestructor(interruptPtr thi) {
- 	free(this);
-}
 
 // If there is an interrupt waiting, true is returned.
 bool isInterruptwaiting(ICPtr this) {
@@ -51,7 +43,7 @@ bool isInterruptwaiting(ICPtr this) {
 }
 
 // Returns the interrupt that is waiting.
-interrupt retrieveInterrupt(ICPtr this) {
+interruptPtr retrieveInterrupt(ICPtr this) {
 	if (this->timer != NULL) {
 		interruptPtr interrupt =
 				(interruptPtr) interruptConstructor(this->timer->the_irq, this->timer->kb_data);
@@ -74,4 +66,8 @@ void interruptCPU(ICPtr this, int the_IRQ, char the_data) {
 	} else {
 		Enqueue(interrupt, this->interruptQueue);
 	}
+}
+
+int main() {
+	ICPtr ic = (ICPtr) ICConstructor();
 }
