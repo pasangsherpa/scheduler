@@ -14,15 +14,15 @@
 #include <pthread.h>
 #include <time.h>
 #include "global.h"
-#include "TestCpu.h"
+#include "queue.h"
+#include "interrupt.h"
+#include "interruptController.h"
 #include "iodevice.h"
 
- IODevicePtr IODeviceConstructor(CPUPtr c, pthread_cond_t condition, int type) {
+ IODevicePtr IODeviceConstructor(ICPtr ic, int type) {
  	IODevicePtr device = (IODevicePtr) malloc(sizeof(IODeviceStr));
- 	device -> cpu = c;
- 	device -> reset = condition;
+ 	device -> interruptController = ic;
  	device -> device_type = type;
- 	device -> mutex = PTHREAD_MUTEX_INITIALIZER;
 
  	pthread_create(&device -> device_thread, NULL, DeviceRun, (void *) device);
  	return device;
@@ -35,29 +35,37 @@ void IODeviceDestructor(IODevicePtr this) {
 
 void *DeviceRun(void *args) {
 	IODevicePtr device = (IODevicePtr) args;
-	srand(time(NULL));
-	float r;
 
-	while (true) {
-		pthread_cond_wait(&device -> reset, &device -> mutex);
-		/*
-		r = (float) rand() %  (float) (IO_QUANTA_UPPER - IO_QUANTA_LOWER);
-		r += IO_QUANTA_LOWER;
-		printf("\nr: %f", r);
+	sleep(0.7);
+	int interrupt = -1;
 
-		sleep(r);
-		*/
-		//interruptCPU(timer -> cpu, TIMER_INT, '0');
+	switch(device->device_type) {
 
+		case IO_AUDIO:
+			interrupt = AUDIO_SERVICE_COMPLETED;
+			break;
+
+		case IO_VIDEO:
+			interrupt = VIDEO_SERVICE_COMPLETED;
+			break;
+
+		default:
+			printf("\nIO Device: (device type not recognized)\n");
+			break;
 	}
+
+	interruptCPU(device->interruptController, interrupt, '0');
 }
 
-
+/*
 int main() {
-	pthread_cond_t reset = PTHREAD_COND_INITIALIZER;
-	CPUPtr cpu = CPUConstructor(10, reset);
-	IODevicePtr device = IODeviceConstructor(cpu, reset, IO_AUDIO);
+	ICPtr ic = (ICPtr) ICConstructor();
+	IODevicePtr device = IODeviceConstructor(ic, IO_AUDIO);
+	printf("\nDevice Started");
 
 	int i;
-	for (i = 0; i< 99999; i++) {}
+	for (i = 0; (i < 99999999) &&
+					(!isInterruptWaiting(device->interruptController)) ; i++) { }
+	printf("\nSignaled!");
 }
+*/

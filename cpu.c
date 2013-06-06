@@ -77,6 +77,9 @@ void initCPU(CPUPtr this, int totalProcess, int totalKBProcess,
 	//set the currect process in cpu.
 	this->current_process
 			= this->scheduler->getCurrrentProcess(this->scheduler);
+
+	// Start timer.
+	this -> timer = (SysTimerPtr) SysTimerConstructor(this -> interruptController, this -> reset);
 }
 
 /*
@@ -120,6 +123,7 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 			case VIDEO_SERVICE_REQ:
 				switchProcess(this->scheduler, &this->PC, VIDEO_SERVICE_REQ,
 						NULL);
+				IODeviceConstructor(this->interruptController, IO_VIDEO);
 				break;
 
 			case VIDEO_SERVICE_COMPLETED: //no context switch
@@ -143,6 +147,7 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 				printf("In Audio Service Request\n");
 				switchProcess(this->scheduler, &this->PC, AUDIO_SERVICE_REQ,
 						NULL);
+				IODeviceConstructor(this->interruptController, IO_AUDIO);
 				break;
 
 			case AUDIO_SERVICE_COMPLETED: //no context switch
