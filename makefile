@@ -53,6 +53,6 @@ clean :
 	-rm -f *.o scheduler
 
 run :
-	./scheduler -p 22 -k 2 -io 3 -pc 3 10
+	./scheduler -p 22 -k 2 -io 3 -pc 3 100
 
 rebuild: clean build
