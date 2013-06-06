@@ -12,9 +12,9 @@
 #define Error(Str)        FatalError(Str)
 #define FatalError(Str)   fprintf(stderr, "%s\n", Str), exit(1)
 
-typedef void *ElementType;
-
 #ifndef _Queue_h
+#define _Queue_h
+typedef void *ElementType;
 
   struct QueueRecord;
   typedef struct QueueRecord *Queue;

@@ -9,8 +9,19 @@
  *
  */
 
+#ifndef INTERRUPT_H
+#include "interrupt.h"
+#endif
 
- typedef struct IC {
+#ifndef GLOBAL_H
+#include "global.h"
+#endif
+
+#ifndef QUEUE_H
+#include "queue.h"
+#endif
+
+typedef struct IC {
 	Queue interruptQueue;
 	interruptPtr timer;
 

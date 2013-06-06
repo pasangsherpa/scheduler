@@ -24,6 +24,18 @@
 #include "pcb.h"
 #endif
 
+#ifndef INTERRUPTCONTROLLER_H
+#include "interruptController.h"
+#endif
+
+#ifndef GLOBAL_H
+#include "global.h"
+#endif
+
+#ifndef QUEUE_H
+#include "queue.h"
+#endif
+
 typedef struct cpu {
         int PC; 				//Program counter
 		int max_step_count; 	//Number of steps this CPU will run.
@@ -49,7 +61,7 @@ void initCPU (CPUPtr this, int totalProcess, int totalKBProcess, int totalIOProc
 int totalPrCoProcess, int totalComputeProcess, int the_max_step_count);
 //helper methods
 void setNextProcess(CPUPtr this);
-
+void printQueueElement(CPUPtr this, int q_type);
 void keyboardServiceRequest(CPUPtr this);
 void keyboardServiceCompleted(CPUPtr this);
 void getKey(CPUPtr this); //

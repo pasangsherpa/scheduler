@@ -10,20 +10,13 @@
  */
 
 #include <pthread.h>
-#include "interrupt.h"
-#include "interruptController.h"
 #include "cpu.h"
 
-#ifndef GLOBAL_H
-#include "global.h"
-#endif
 
 CPUPtr CPUConstructor() {
 	CPUPtr result = (CPUPtr) malloc(sizeof(CPUStr));
 	result->PC = -1; // Initial PC (will be incremented to 0).
 	result->current_process = NULL; //currently running process
-	result->INT = 0; //whether this cpu is interrupted.
-	result->IRQ = 0; //IRQ code of the interrupting device
 	result->buffer_data = '0'; //buffer
 	result->process_pid = 0; //current process pid
 	return result;
@@ -76,6 +69,8 @@ void initCPU(CPUPtr this, int totalProcess, int totalKBProcess,
 		pid++;
 	}
 
+	printf("Total process created = %d\n", totalProcess);
+
 	printf("------------------------------------\n");
 	//Load first process in the scheduler.
 	this->scheduler->setCurrentProcess(this->scheduler);
@@ -98,7 +93,6 @@ void setNextProcess(CPUPtr this) {
  */
 void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 	while (this->max_step_count > 0) {
-
 		this->PC++; // Increment the PC.
 		printf("Current count = %d\n", this->max_step_count);
 		printf("PC Value: %d\n", this->PC);
@@ -215,7 +209,7 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 		this->max_step_count--; //decrement the max step.
 	}
 
-	printf("\nThere is no more tasks in the ready quueue.");
+	printf("\nThere are no more tasks in the ready queue.");
 
 	//kill cpu
 }
@@ -252,7 +246,7 @@ void keyboardServiceCompleted(CPUPtr this) {
 void getKey(CPUPtr this) {
 	char stdin_char = getchar();
 	getchar();
-	interruptCPU(this, 1, stdin_char);
+	interruptCPU(this->interruptController, 1, stdin_char);
 }
 
 /*
@@ -282,6 +276,45 @@ void printState(CPUPtr this) {
 	printf("waiting\n");
 	printf("----------------------------------------------------\n");
 }
+
+/**
+ * Print Queue
+ */
+void printQueueElement(CPUPtr this, int q_type) {
+	char* name;
+	Queue Q;
+	int i;
+	switch (q_type) {
+	case (READY_QUEUE):
+		Q = this->scheduler->ready_queue;
+		name = "Ready Queue";
+		break;
+	case (IO_QUEUE):
+		Q = this->scheduler->io_queue;
+		name = "IO Queue";
+		break;
+	case (MUTEX_QUEUE):
+		//		Q = this->mutex->mutex_queue;
+		name = "Mutex Queue";
+		break;
+	default:
+		Q = this->scheduler->ready_queue;
+		name = "Ready Queue";
+		break;
+	}
+	printf("size rq: %d\n\n", Size(this->scheduler->ready_queue));
+
+	ProcessPtr* p = (ProcessPtr*) getQueue(Q);
+
+	printf("%s = ", name);
+	for (i = 0; i < Size(Q); i++) {
+//		printf("%d:", p[i]->pcb->pid);
+	}
+
+	printf("\n");
+}
+
+
 
 //Destructor.
 int CPUDestructor(CPUPtr this) {

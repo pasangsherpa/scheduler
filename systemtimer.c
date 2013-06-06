@@ -51,7 +51,7 @@ void *SysTimerRun(void *args) {
 
 	while (true) {
 		sleep(QUANTA);
-		interruptCPU(timer -> cpu, TIMER_INT, '0');
+		interruptCPU(timer->cpu->interruptController, TIMER_INT, '0');
 		pthread_cond_wait(&timer -> reset, &timer -> mutex);
 	}
 }

@@ -142,4 +142,3 @@ ElementType * getQueue(Queue Q){
 	}
 	return result;
 }
-

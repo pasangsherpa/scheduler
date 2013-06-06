@@ -8,9 +8,15 @@
  *  @author: Mars Gokturk
  *
  */
+#ifndef GLOBAL_H
+#include "global.h"
+#endif
 
-  typedef struct interrupt {
+typedef struct interrupt {
  	int the_irq;
  	char kb_data;				// Data from a keyboard interrupt.
 
 } interruptStr, *interruptPtr;
+
+interruptPtr interruptConstructor(int irq, char data);
+void interruptDestructor(interruptPtr this);

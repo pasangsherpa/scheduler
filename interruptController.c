@@ -9,12 +9,9 @@
  *
  */
 
- #include <stdio.h>
- #include <stdlib.h>
- #include "global.h"
- #include "interrupt.h"
- #include "queue.h"
- #include "interruptController.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include "interruptController.h"
 
 // Constructor
 ICPtr ICConstructor() {

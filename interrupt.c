@@ -11,11 +11,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "global.h"
 #include "interrupt.h"
 
- // Constructor
- interruptPtr interruptConstructor(int irq, char data) {
+// Constructor
+interruptPtr interruptConstructor(int irq, char data) {
   	interruptPtr interrupt = (interruptPtr) malloc(sizeof(interruptStr));
   	interrupt->the_irq = irq;
   	interrupt->kb_data = data;

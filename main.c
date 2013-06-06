@@ -36,18 +36,6 @@ int generateRandomNumber(int min, int max){
 	return r;
 }
 
-/*
-This method creates a processor thread with a random step number in a range(total step number of CPU),
-and generates random instruction number to make service calls.
-*/
-//thread generateProcessThread(int totalStepNum, int type){
-	//generate random number of steps in range of totalStepNum
-	//set/generate number of service calls
-	//generate random instruction number to make the service call.
-	//create thread
-	//start thread.
-//}
-
 /**
 This program expects arguments in this format:
 -p X -k X -io X -pc X X(number of total steps CPU will count), where X is an integer.
@@ -103,12 +91,6 @@ int main(int argc, char * argv[]){
 	printf("Step Count: %d\n",stepCount);
 	printf("------------------------------------\n");
 
-	//start	
-		//main creates the CPU thread
-		//CPU cleans up/returns when done
-		//main returns when CPU returns.(thread join)
-	
-	
 	CPUPtr cpu = CPUConstructor();
 	initCPU(cpu, processNumber, keyboardProcess, ioProcess, pr_coProcess, computeBound, stepCount);
 	//Construct the timer (starts the timer)
