@@ -88,14 +88,6 @@ void setNextProcess(CPUPtr this) {
 	this->process_pid = this->current_process->pcb->pid;
 }
 
-/*
- Devices call this method when they send INT signal to the CPU.
- */
-void interruptCPU(CPUPtr this, int the_IRQ, char the_data) {
-	this->INT = 1;
-	this->IRQ = the_IRQ;
-	this->buffer_data = the_data;
-}
 
 /*
  CPU thread runs as long as there are more steps to run.
