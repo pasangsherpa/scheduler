@@ -52,6 +52,10 @@ void *DeviceRun(void *args) {
 			interrupt = VIDEO_SERVICE_COMPLETED;
 			break;
 
+		case IO_KEYBOARD:
+			interrupt = KEYBOARD_SERVICE_COMPLETED;
+			break;
+
 		default:
 			printf("\nIO Device: (device type not recognized)\n");
 			break;

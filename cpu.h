@@ -53,6 +53,7 @@ typedef struct cpu {
 		ProcessPtr current_process;	//currently running process pcb
 		ICPtr interruptController;
 		SysTimerPtr timer;
+		KeyThreadPtr key;
 		pthread_cond_t reset;
 
 } CPUStr, *CPUPtr;
