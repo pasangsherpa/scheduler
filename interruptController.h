@@ -20,10 +20,10 @@
 ICPtr ICConstructor();
 
 // Returns bool true if there is an interrupt waiting to be serviced.
-bool isInterruptwaiting(ICPtr this);
+bool isInterruptWaiting(ICPtr this);
 
 // Returns the interrupt that is waiting.
 interruptPtr retrieveInterrupt(ICPtr this);
 
 // Used by processes and devices to signal an interrupt
-void interruptCPU(ICPtr this, int the_IRQ, char the_data)
+void interruptCPU(ICPtr this, int the_IRQ, char the_data);

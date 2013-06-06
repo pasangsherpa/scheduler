@@ -8,8 +8,11 @@
  *  @author: Mars Gokturk
  *
  */
-#include "cpu.h"
+
 #include <pthread.h>
+#include "interrupt.h"
+#include "interruptController.h"
+#include "cpu.h"
 
 #ifndef GLOBAL_H
 #include "global.h"
@@ -32,6 +35,7 @@ void initCPU(CPUPtr this, int totalProcess, int totalKBProcess,
 		int the_max_step_count) {
 	this->reset = PTHREAD_COND_INITIALIZER;
 	this->scheduler = SchedulerConstructor(totalProcess);//process scheduler
+	this->interruptController = ICConstructor();
 	this->max_step_count = the_max_step_count; //max steps this CPU will run
 
 	//Setup all processes
@@ -104,9 +108,12 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 		 * Checks to see whether an interrupt has occured.
 		 * If so, it figures out what generated it and takes appropriate action.
 		 */
-		if (this->INT == 1) {
+		if (isInterruptWaiting(this->interruptController)) {
 
-			switch (this->IRQ) { // Figure out which interrupt has occured.
+			// Retrieve the interrupt.
+			interruptPtr interrupt = retrieveInterrupt(this->interruptController);
+
+			switch (interrupt->the_irq) { // Figure out which interrupt has occured.
 
 			case TIMER_INT:
 				printf("Timer interrupt/n");
@@ -177,8 +184,9 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 
 			setNextProcess(this);
 			printf("pid after context switch: %d\n", this -> process_pid);
-			// Fix! Need to check if there are others waiting!
-			this -> INT = 0;
+
+			// Destroy the interrupt.
+			interruptDestructor(interrupt);
 		}
 
 		/*
@@ -190,7 +198,8 @@ void runCPU(CPUPtr this) { //main thread.//assumes that the fields are set
 			printf("\nAbout to make a service call...\n");
 			printMessage(this ->current_process);
 			advanceRequest(this -> current_process);
-			interruptCPU(this, getNextTrapCode(this ->current_process), '0');
+			interruptCPU(this->interruptController,
+										getNextTrapCode(this ->current_process), '0');
 		}
 
 		/*

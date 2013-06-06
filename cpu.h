@@ -31,8 +31,7 @@ typedef struct cpu {
 		int process_pid;
 		char buffer_data;
 		ProcessPtr current_process;	//currently running process pcb
-		int INT;				//whether INT is asserted
-		int IRQ;
+		ICPtr interruptController;
 		pthread_cond_t reset;
 
 } CPUStr, *CPUPtr;
@@ -46,7 +45,6 @@ int CPUDestructor(CPUPtr this);
 //METHODS
 //main thread
 void runCPU(CPUPtr this);
-void interruptCPU(CPUPtr this, int the_IRQ, char the_data);
 void initCPU (CPUPtr this, int totalProcess, int totalKBProcess, int totalIOProcess,
 int totalPrCoProcess, int totalComputeProcess, int the_max_step_count);
 //helper methods

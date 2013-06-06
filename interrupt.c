@@ -27,6 +27,8 @@ void interruptDestructor(interruptPtr this) {
  	free(this);
 }
 
+/*
 int main() {
 	interruptPtr i = (interruptPtr) interruptConstructor(0, '0');
 }
+*/

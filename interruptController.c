@@ -33,10 +33,10 @@ void ICDestructor(ICPtr this) {
 
 
 // If there is an interrupt waiting, true is returned.
-bool isInterruptwaiting(ICPtr this) {
+bool isInterruptWaiting(ICPtr this) {
 	bool result = false;
 
-	if ((!IsEmpty(this->interruptQueue)) || (this->timer != NULL) {
+	if ((!IsEmpty(this->interruptQueue)) || (this->timer != NULL)) {
 		result = true;
 	}
 	return result;
@@ -68,6 +68,31 @@ void interruptCPU(ICPtr this, int the_IRQ, char the_data) {
 	}
 }
 
+/*
 int main() {
 	ICPtr ic = (ICPtr) ICConstructor();
-}
+
+	interruptCPU(ic, AUDIO_SERVICE_REQ, '0');
+	interruptCPU(ic, VIDEO_SERVICE_REQ, '0');
+
+	if (isInterruptWaiting(ic) == true) {
+		printf("\nInterrupt Waiting number: %d", retrieveInterrupt(ic)->the_irq);
+	} else {
+		printf("\nno interrupt waiting");
+	}
+
+	interruptCPU(ic, TIMER_INT, '0');
+
+	if (isInterruptWaiting(ic) == true) {
+			printf("\nInterrupt Waiting number: %d", retrieveInterrupt(ic)->the_irq);
+		} else {
+			printf("\nno interrupt waiting");
+	}
+
+
+	if (isInterruptWaiting(ic) == true) {
+				printf("\nInterrupt Waiting number: %d", retrieveInterrupt(ic)->the_irq);
+			} else {
+				printf("\nno interrupt waiting");
+	}
+}*/
