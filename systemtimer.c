@@ -12,9 +12,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
-#include "global.h"
-#include "interrupt.h"
-#include "interruptController.h"
 #include "systemtimer.h"
 
 #ifdef __unix__

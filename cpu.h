@@ -36,6 +36,14 @@
 #include "queue.h"
 #endif
 
+#ifndef IODEVICE_H
+#include "iodevice.h"
+#endif
+
+#ifndef SYSTEMTIMER_H
+#include "systemtimer.h"
+#endif
+
 typedef struct cpu {
         int PC; 				//Program counter
 		int max_step_count; 	//Number of steps this CPU will run.

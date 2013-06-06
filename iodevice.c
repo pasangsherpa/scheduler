@@ -13,11 +13,8 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <time.h>
-#include "global.h"
-#include "queue.h"
-#include "interrupt.h"
-#include "interruptController.h"
 #include "iodevice.h"
+
 
  IODevicePtr IODeviceConstructor(ICPtr ic, int type) {
  	IODevicePtr device = (IODevicePtr) malloc(sizeof(IODeviceStr));

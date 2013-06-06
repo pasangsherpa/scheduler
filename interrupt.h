@@ -8,6 +8,9 @@
  *  @author: Mars Gokturk
  *
  */
+#ifndef INTERRUPT_H
+#define INTERRUPT_H
+
 #ifndef GLOBAL_H
 #include "global.h"
 #endif
@@ -20,3 +23,5 @@ typedef struct interrupt {
 
 interruptPtr interruptConstructor(int irq, char data);
 void interruptDestructor(interruptPtr this);
+
+#endif /* INTERRUPT_H */

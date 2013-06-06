@@ -94,7 +94,7 @@ int main(int argc, char * argv[]){
 	CPUPtr cpu = CPUConstructor();
 	initCPU(cpu, processNumber, keyboardProcess, ioProcess, pr_coProcess, computeBound, stepCount);
 	//Construct the timer (starts the timer)
-	SysTimerConstructor(cpu, cpu->reset);
+	SysTimerConstructor(cpu->interruptController, cpu->reset);
 	runCPU(cpu);
 
 		

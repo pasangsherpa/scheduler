@@ -13,12 +13,16 @@
 #define SYSTEMTIMER_H
 #include <pthread.h>
 
-#ifndef CPU_H
-#include "cpu.h"
+#ifndef GLOBAL_H
+#include "global.h"
+#endif
+
+#ifndef INTERRUPTCONTROLLER_H
+#include "interruptController.h"
 #endif
 
 typedef struct timer {
-	ICPtr interruptController
+	ICPtr interruptController;
 	pthread_t clock_thread;
 	pthread_cond_t reset;				// Condition variable CPU uses to signal timer.
 	pthread_mutex_t mutex;			// Unused mutex only for signaling.

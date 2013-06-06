@@ -12,6 +12,22 @@
 #ifndef IODEVICE_H
 #define IODEVICE_H
 
+#ifndef INTERRUPTCONTROLLER_H
+#include "interruptController.h"
+#endif
+
+#ifndef GLOBAL_H
+#include "global.h"
+#endif
+
+#ifndef QUEUE_H
+#include "queue.h"
+#endif
+
+#ifndef INTERRUPT_H
+#include "interrupt.h"
+#endif
+
 typedef struct iodevice {
 	int device_type;
 	ICPtr interruptController;

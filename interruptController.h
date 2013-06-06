@@ -9,6 +9,9 @@
  *
  */
 
+#ifndef INTERRUPTCONTROLLER_H
+#define INTERRUPTCONTROLLER_H
+
 #ifndef INTERRUPT_H
 #include "interrupt.h"
 #endif
@@ -38,3 +41,5 @@ interruptPtr retrieveInterrupt(ICPtr this);
 
 // Used by processes and devices to signal an interrupt
 void interruptCPU(ICPtr this, int the_IRQ, char the_data);
+
+#endif /* INTERRUPTCONTROLLER_H */
