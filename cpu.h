@@ -44,6 +44,10 @@
 #include "systemtimer.h"
 #endif
 
+#ifndef KEYTHREAD_H
+#include "keyThread.h"
+#endif
+
 typedef struct cpu {
         int PC; 				//Program counter
 		int max_step_count; 	//Number of steps this CPU will run.

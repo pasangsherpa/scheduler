@@ -8,8 +8,26 @@
  *  @author: Mars Gokturk
  *
  */
+#ifndef KEYTHREAD_H
+#define KEYTHREAD_H
 
- typedef struct key {
+#ifndef INTERRUPTCONTROLLER_H
+#include "interruptController.h"
+#endif
+
+#ifndef GLOBAL_H
+#include "global.h"
+#endif
+
+#ifndef QUEUE_H
+#include "queue.h"
+#endif
+
+#ifndef INTERRUPT_H
+#include "interrupt.h"
+#endif
+
+typedef struct key {
 	 ICPtr interruptController;
 	pthread_t key_thread;
  	char c;
@@ -24,3 +42,6 @@ void KeyThreadDestructor(KeyThreadPtr this);
 
 
 void *KeyRun(void *args);
+
+#endif /* KEYTHREAD_H */
+

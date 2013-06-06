@@ -1,4 +1,5 @@
-OBJS = main.o cpu.o scheduler.o systemtimer.o process.o pcb.o mutex.o request.o interrupt.o interruptController.o iodevice.o queue.o
+OBJS = main.o cpu.o scheduler.o systemtimer.o process.o pcb.o mutex.o request.o \
+	interrupt.o interruptController.o iodevice.o keyThread.o queue.o
 CC = gcc 
 DEBUG = -g
 CFLAGS = -Wall -c $(DEBUG)
@@ -10,13 +11,15 @@ build : $(OBJS)
 main.o: main.c systemtimer.h cpu.h 
 	$(CC) $(CFLAGS) main.c
 
-cpu.o: cpu.c cpu.h scheduler.h process.h mutex.h request.h queue.h iodevice.h interrupt.h systemtimer.h interruptController.h global.h
+cpu.o: cpu.c cpu.h scheduler.h process.h mutex.h request.h queue.h iodevice.h \
+	interrupt.h systemtimer.h interruptController.h keyThread.h global.h
 	$(CC) $(CFLAGS) cpu.c
 	
 scheduler.o: scheduler.c scheduler.h process.h mutex.h request.h queue.h global.h
 	$(CC) $(CFLAGS) scheduler.c
 
-interruptController.o : interruptController.c interruptController.h global.h queue.h interrupt.h 
+interruptController.o : interruptController.c interruptController.h global.h queue.h \
+	interrupt.h 
 	$(CC) $(CFLAGS) interruptController.c
 
 process.o : process.c process.h pcb.h global.h
@@ -42,6 +45,9 @@ interrupt.o : interrupt.c interrupt.h global.h
 
 iodevice.o : iodevice.c iodevice.h global.h interrupt.h interruptController.h queue.h
 	$(CC) $(CFLAGS) iodevice.c
+	
+keyThread.o : keyThread.c keyThread.h global.h interrupt.h interruptController.h queue.h
+	$(CC) $(CFLAGS) keyThread.c
 	
 clean : 
 	-rm -f *.o scheduler

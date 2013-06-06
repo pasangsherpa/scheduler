@@ -42,9 +42,11 @@ typedef enum { false, true } bool;
 #define KEYBOARD 			1
 #define PRODUCER			2
 #define CONSUMER			3
-#define IO_AUDIO				4
+#define IO_AUDIO			4
 #define IO_VIDEO 			5
 #define IO_DISK				6
+#define IO_KEYBOARD 		7
+
 //Process State
 #define RUNNING 			0
 #define	READY				1
@@ -54,17 +56,17 @@ typedef enum { false, true } bool;
 /******* END PROCESS ********/
 
 /******TRAP AND INT(KERNEL SERVICE)VECTOR TABLE*****/
-#define TIMER_INT				1 //represents a memory address
-#define VIDEO_SERVICE_REQ		2
-#define VIDEO_SERVICE_COMPLETED	3
-#define KEYBOARD_SERVICE_REQ	4
+#define TIMER_INT						1 //represents a memory address
+#define VIDEO_SERVICE_REQ				2
+#define VIDEO_SERVICE_COMPLETED			3
+#define KEYBOARD_SERVICE_REQ			4
 #define KEYBOARD_SERVICE_COMPLETED		5
-#define AUDIO_SERVICE_REQ		6
-#define AUDIO_SERVICE_COMPLETED	7
-#define MUTEX_LOCK				8
-#define MUTEX_UNLOCK			9
-#define COND_WAIT				10
-#define COND_SIGNAL				11
+#define AUDIO_SERVICE_REQ				6
+#define AUDIO_SERVICE_COMPLETED			7
+#define MUTEX_LOCK						8
+#define MUTEX_UNLOCK					9
+#define COND_WAIT						10
+#define COND_SIGNAL						11
 /*******END KERNEL SERVICE***************************/
 
 /*******IRQ LINES***********/
